@@ -137,15 +137,6 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .book-cover #configNotice{ color:#F3D9E6; }
-  #pinUnlock{
-    display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap;
-  }
-  #pinUnlock input{
-    width:130px; text-align:center; letter-spacing:0.3em; font-size:1rem;
-    border-radius:999px; border:1.5px solid rgba(255,255,255,0.35);
-    background:rgba(255,255,255,0.12); color:#fff; padding:10px 16px;
-  }
-  #pinUnlock input::placeholder{ color:rgba(255,255,255,0.65); letter-spacing:normal; font-size:0.85rem; }
   .book-cover .btn.ghost{
     background:transparent; color:#F3D9E6; box-shadow:none;
     border:1.5px solid rgba(255,240,248,0.3);
@@ -689,12 +680,6 @@
       <p id="gateTagline">A little corner of the internet just for the two of us</p>
       <button class="btn" id="signInBtn">Sign in with Google</button>
 
-      <div id="pinUnlock" style="display:none;">
-        <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="pinInput" placeholder="Enter your PIN">
-        <button class="btn" id="pinUnlockBtn">Open Book</button>
-      </div>
-      <button class="btn ghost small" id="pinToggleBtn" style="display:none; margin-top:10px;"></button>
-
       <div id="configNotice"></div>
     </div>
   </div>
@@ -864,25 +849,6 @@
         <button class="btn small" id="saveNicknamesBtn">Save nicknames</button>
       </div>
     </div>
-
-    <div class="card settings-grid" id="pinCard" style="display:none;">
-      <h2 class="section-title">Quick unlock PIN</h2>
-      <p style="font-size:0.8rem;color:var(--plum-2); margin:0;">
-        Set a PIN so this device can jump back in without picking your Google account every time.
-        This only skips the click-through — Google may still occasionally ask you to confirm if your session has expired.
-        The PIN is stored only on this device, never synced.
-      </p>
-      <div class="row">
-        <div>
-          <label class="field-label">Set / change PIN</label>
-          <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="newPinInput" placeholder="4-6 digits">
-        </div>
-      </div>
-      <div class="actions" style="justify-content:flex-end; gap:8px;">
-        <button class="btn small ghost" id="removePinBtn">Remove PIN</button>
-        <button class="btn small" id="savePinBtn">Save PIN</button>
-      </div>
-    </div>
     </div>
   </section>
   </div>
@@ -958,22 +924,6 @@ function uid(){
 /* ---------------- Local device preferences (quick-unlock PIN only) ----------------
    The PIN lives only in this browser's localStorage — never synced, never seen
    by the other person. It just reduces friction on this specific device. */
-function getSavedPin(email){
-  try{ return localStorage.getItem('ourlavender-pin-' + email) || ''; }catch(e){ return ''; }
-}
-function setSavedPin(email, pin){
-  try{
-    if(pin){ localStorage.setItem('ourlavender-pin-' + email, pin); }
-    else{ localStorage.removeItem('ourlavender-pin-' + email); }
-  }catch(e){}
-}
-function getLastEmail(){
-  try{ return localStorage.getItem('ourlavender-last-email') || ''; }catch(e){ return ''; }
-}
-function setLastEmail(email){
-  try{ localStorage.setItem('ourlavender-last-email', email); }catch(e){}
-}
-
 /* ---------------- Shared nicknames ----------------
    Nicknames are stored in the shared Drive file (data.nicknames), keyed by
    email, so a nickname either of you sets shows up for both of you. */
@@ -996,62 +946,9 @@ window.addEventListener('load', () => {
     $('#configNotice').textContent = "Test mode: sign-in is bypassed for now and data is saved to this browser only. Flip CONFIG.MOCK_MODE to false once your Google Client ID and Folder ID are filled in.";
   } else if(!configLooksReady()){
     $('#configNotice').textContent = "Heads up: this file still needs your Client ID and Folder ID filled in at the top of the <script> section before sign-in will work.";
-  } else {
-    setupPinGateIfAvailable();
   }
   initGoogle();
 });
-
-function setupPinGateIfAvailable(){
-  const email = getLastEmail();
-  if(!email) return; // never signed in on this device — leave the default "Sign in with Google" flow
-  const pin = getSavedPin(email);
-  const name = KNOWN_PEOPLE[email] || '';
-
-  if(pin){
-    // Returning, PIN protected: enter PIN, then "Open Book" quietly re-authenticates.
-    $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}. Enter your PIN to open the book.`;
-    $('#signInBtn').style.display = 'none';
-    $('#pinUnlock').style.display = 'flex';
-    $('#pinToggleBtn').style.display = 'inline-block';
-    $('#pinToggleBtn').textContent = 'Use Google sign-in instead';
-    $('#pinInput').focus();
-  } else {
-    // Returning, no PIN: a single "Open Book" tap quietly re-authenticates, no account picker.
-    $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}.`;
-    $('#signInBtn').textContent = 'Open Book';
-    $('#signInBtn').dataset.quickReopen = 'true';
-    $('#pinToggleBtn').style.display = 'inline-block';
-    $('#pinToggleBtn').textContent = 'Sign in with a different account';
-  }
-}
-
-$('#pinToggleBtn').addEventListener('click', () => {
-  $('#signInBtn').style.display = 'inline-block';
-  $('#signInBtn').textContent = 'Sign in with Google';
-  delete $('#signInBtn').dataset.quickReopen;
-  $('#pinUnlock').style.display = 'none';
-  $('#pinToggleBtn').style.display = 'none';
-  $('#gateTagline').textContent = "A little corner of the internet just for the two of us";
-});
-
-async function tryPinUnlock(){
-  const email = getLastEmail();
-  const enteredPin = $('#pinInput').value.trim();
-  const savedPin = getSavedPin(email);
-  if(!enteredPin || enteredPin !== savedPin){
-    alert("That PIN doesn't match. Try again, or use Google sign-in instead.");
-    return;
-  }
-  if(!tokenClient){ alert("Still loading Google sign-in, try again in a second."); return; }
-  setSync('busy', 'Opening...');
-  // Let Google handle its normal, reliable flow — just pre-fill the right account
-  // so it's a single tap rather than picking from scratch.
-  tokenClient.requestAccessToken({ hint: email });
-}
-
-$('#pinUnlockBtn').addEventListener('click', tryPinUnlock);
-$('#pinInput').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); tryPinUnlock(); } });
 
 function initGoogle(){
   if(CONFIG.MOCK_MODE) return;
@@ -1083,12 +980,7 @@ $('#signInBtn').addEventListener('click', () => {
     return;
   }
   if(!tokenClient){ alert("Still loading Google sign-in, try again in a second."); return; }
-  if($('#signInBtn').dataset.quickReopen === 'true'){
-    const email = getLastEmail();
-    tokenClient.requestAccessToken({ hint: email });
-  } else {
-    tokenClient.requestAccessToken();
-  }
+  tokenClient.requestAccessToken();
 });
 
 $('#signOutBtn').addEventListener('click', () => {
@@ -1105,15 +997,12 @@ async function afterSignIn(){
   });
   me = await uRes.json();
   if(me.email) me.email = me.email.trim().toLowerCase();
-  setLastEmail(me.email);
 
   await loadData(); // brings in data.nicknames from the shared file
   me.name = displayNameFor(me.email);
 
   $('#nicknameCard').style.display = 'flex';
   renderNicknameInputs();
-  $('#pinCard').style.display = 'flex';
-  $('#newPinInput').value = '';
 
   $('#gate').style.display = 'none';
   $('#app').classList.add('shown');
@@ -2119,21 +2008,6 @@ $('#saveNicknamesBtn').addEventListener('click', () => {
   renderAll();
   persist();
   alert("Nicknames saved — updated everywhere for both of you.");
-});
-
-$('#savePinBtn').addEventListener('click', () => {
-  if(!me || !me.email) return;
-  const pin = $('#newPinInput').value.trim();
-  if(!/^\d{4,6}$/.test(pin)){ alert("PIN needs to be 4–6 digits."); return; }
-  setSavedPin(me.email, pin);
-  alert("PIN saved. Next time you open this on this device, you can unlock with it instead of the full Google sign-in.");
-});
-
-$('#removePinBtn').addEventListener('click', () => {
-  if(!me || !me.email) return;
-  setSavedPin(me.email, '');
-  $('#newPinInput').value = '';
-  alert("PIN removed from this device.");
 });
 
 /* ---------------- Render all + helpers ---------------- */
