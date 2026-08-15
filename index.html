@@ -203,7 +203,14 @@
     font-size:1.15rem; margin:0; color:var(--plum); opacity:0.85;
   }
   .whoami{ display:flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--plum-2); }
-  .whoami img{ width:26px; height:26px; border-radius:50%; border:2px solid var(--paper); box-shadow:0 0 0 1.5px var(--rose-soft); }
+  .icon-btn{
+    width:30px; height:30px; padding:0 !important; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform .3s ease;
+  }
+  .icon-btn:hover{ transform:rotate(90deg); }
+  .icon-btn.spinning svg{ animation:iconSpin 0.7s linear infinite; }
+  @keyframes iconSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
 
   /* washi tape tabs */
   nav.tabs{
@@ -211,13 +218,15 @@
     padding-top:22px; position:relative; z-index:2;
     flex-shrink:0;
     order:2;
-    width:64px;
+    width:46px;
   }
   nav.tabs button{
     font-family:'Nunito Sans',sans-serif;
-    font-weight:700; font-size:0.62rem; letter-spacing:0.02em; text-transform:uppercase;
+    font-weight:700; font-size:0.68rem; letter-spacing:0.04em; text-transform:uppercase;
     border:none; cursor:pointer;
-    padding:12px 4px;
+    padding:10px 8px;
+    min-height:78px;
+    width:38px;
     background:var(--paper-2);
     color:var(--plum-2);
     border-radius:0 10px 10px 0;
@@ -225,8 +234,10 @@
     box-shadow:2px 2px 5px rgba(74,49,120,0.08);
     transition:background .15s ease, color .15s ease, transform .15s ease;
     transform:translateX(-4px);
-    line-height:1.15;
-    word-break:break-word;
+    writing-mode:vertical-rl;
+    text-orientation:mixed;
+    rotate:180deg;
+    display:flex; align-items:center; justify-content:center;
   }
   nav.tabs button:hover{ transform:translateX(0); color:var(--plum); }
   nav.tabs button.active{
@@ -244,7 +255,7 @@
 
   .book{
     position:relative; padding-left:16px; padding-bottom:14px;
-    width:calc(var(--book-w) + 16px + 74px);
+    width:calc(var(--book-w) + 16px + 54px);
     max-width:100%;
     margin:0 auto;
     flex:1;
@@ -368,12 +379,15 @@
     width:70px; height:22px; background:rgba(230,174,203,0.5);
     box-shadow:0 2px 4px rgba(0,0,0,0.08);
   }
-  .post .post-del{
-    position:absolute; top:8px; right:8px; z-index:2;
+  .post .post-actions{
+    position:absolute; top:8px; right:8px; z-index:2; display:flex; gap:6px;
+  }
+  .post .post-actions button{
     width:24px; height:24px; border-radius:50%; border:none; cursor:pointer;
     background:rgba(255,255,255,0.85); color:var(--rose); font-size:0.8rem;
     box-shadow:0 2px 6px rgba(0,0,0,0.15);
   }
+  .post .post-actions .post-edit{ color:var(--plum-2); font-size:0.78rem; }
   .post img{ width:100%; display:block; border-radius:1px; margin-bottom:10px; background:var(--paper-2); }
   .post .cap{ font-family:'Caveat',cursive; font-size:1.25rem; color:var(--ink); line-height:1.3; }
   .post .meta{ font-size:0.72rem; color:var(--plum-2); margin-top:8px; display:flex; justify-content:space-between; }
@@ -389,9 +403,20 @@
     padding:6px 6px 10px; scroll-behavior:smooth;
   }
   .chat-empty{ margin:auto; text-align:center; color:var(--plum-2); font-size:0.9rem; }
+  .chat-clear-banner{
+    background:var(--paper-2); border-radius:10px; padding:10px 14px;
+    font-size:0.82rem; color:var(--ink); margin-bottom:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .chat-clear-banner .actions-inline{ display:flex; gap:8px; }
+  .chat-clear-banner button{
+    border:none; border-radius:999px; padding:6px 14px; font-size:0.76rem; font-weight:700; cursor:pointer;
+  }
+  .chat-clear-banner .yes-btn{ background:var(--rose); color:#fff; }
+  .chat-clear-banner .no-btn{ background:transparent; color:var(--plum-2); border:1.5px solid var(--line) !important; }
   .chat-daydivider{
-    text-align:center; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;
-    color:var(--plum-2); margin:16px 0 10px; position:relative;
+    text-align:center; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--plum-2); margin:14px 0 8px; position:relative;
   }
   .chat-daydivider span{ background:transparent; padding:0 10px; position:relative; z-index:1; }
   .chat-daydivider::before{
@@ -429,9 +454,9 @@
   .chat-row.grouped .bubble.mine{ border-top-right-radius:5px; }
   .chat-row.grouped .bubble.theirs{ border-top-left-radius:5px; }
   .bubble .ts{
-    font-size:0.62rem; opacity:0; max-height:0; overflow:hidden;
+    font-size:0.58rem; opacity:0; max-height:0; overflow:hidden;
     transition:opacity .15s ease, max-height .15s ease;
-    color:var(--plum-2); margin:3px 10px 0;
+    color:var(--plum-2); margin:2px 10px 0;
   }
   .chat-row.mine .bubble .ts{ text-align:right; }
   .bubble-col:hover .ts, .bubble-col.show-ts .ts{ opacity:0.85; max-height:20px; }
@@ -466,7 +491,8 @@
   .plan .datebox .m{ font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em;}
   .plan .content strong{ font-family:'Cormorant Garamond',serif; }
   .plan .content p{ margin:4px 0 0; font-size:0.85rem; color:var(--plum-2); }
-  .plan button.del{ margin-left:auto; background:none; border:none; cursor:pointer; color:var(--rose); font-size:1rem; }
+  .plan button.del{ margin-left:8px; background:none; border:none; cursor:pointer; color:var(--rose); font-size:1rem; }
+  .plan button.edit{ margin-left:auto; background:none; border:none; cursor:pointer; color:var(--plum-2); font-size:0.9rem; }
 
   /* Countdown */
   #countdownList{ display:flex; flex-direction:column; gap:12px; margin-top:14px; }
@@ -487,9 +513,14 @@
     font-size:1.1rem; color:var(--plum); margin:0 0 2px;
   }
   .countdown-card .cd-sub{ font-family:'Caveat',cursive; color:var(--rose); font-size:1.15rem; }
+  .countdown-card .cd-date{ font-size:0.72rem; color:var(--plum-2); margin-top:2px; }
   .countdown-card .del{
     position:absolute; top:12px; right:12px; background:none; border:none; cursor:pointer;
     color:var(--rose); font-size:1rem;
+  }
+  .countdown-card .edit{
+    position:absolute; top:12px; right:34px; background:none; border:none; cursor:pointer;
+    color:var(--plum-2); font-size:0.9rem;
   }
   .countdown-empty{ text-align:center; color:var(--plum-2); font-size:0.9rem; margin-top:20px; }
 
@@ -505,6 +536,56 @@
     background:#fff; padding:8px 12px; border-radius:999px; box-shadow:var(--shadow);
     font-size:0.72rem; color:var(--plum-2);
   }
+
+  /* Crop modal */
+  .crop-modal{
+    display:none;
+    position:fixed; inset:0; z-index:1000;
+    background:rgba(43,27,36,0.55);
+    align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .crop-modal.open{ display:flex; }
+  .crop-panel{
+    background:var(--paper);
+    border-radius:16px;
+    padding:20px;
+    max-width:560px; width:100%;
+    box-shadow:0 24px 60px rgba(43,27,36,0.4);
+  }
+  .crop-stage{
+    position:relative;
+    width:100%;
+    max-height:60vh;
+    display:flex; align-items:center; justify-content:center;
+    background:#111;
+    border-radius:10px;
+    overflow:hidden;
+    touch-action:none;
+    user-select:none;
+  }
+  .crop-stage img{
+    display:block;
+    max-width:100%; max-height:60vh;
+    pointer-events:none;
+  }
+  .crop-box{
+    position:absolute;
+    border:2px solid #fff;
+    box-shadow:0 0 0 2000px rgba(0,0,0,0.5);
+    cursor:move;
+    touch-action:none;
+  }
+  .crop-handle{
+    position:absolute; width:16px; height:16px;
+    background:#fff; border:2px solid var(--rose); border-radius:50%;
+    transform:translate(-50%, -50%);
+    touch-action:none;
+  }
+  .crop-handle[data-corner="nw"]{ top:0; left:0; cursor:nwse-resize; }
+  .crop-handle[data-corner="ne"]{ top:0; left:100%; cursor:nesw-resize; }
+  .crop-handle[data-corner="sw"]{ top:100%; left:0; cursor:nesw-resize; }
+  .crop-handle[data-corner="se"]{ top:100%; left:100%; cursor:nwse-resize; }
 
   @media (max-width:560px){
     :root{ --book-w: 94vw; --book-h: min(74vh, 660px); }
@@ -527,6 +608,10 @@
       border-radius:10px 10px 0 0;
       padding:8px 11px 10px; font-size:0.66rem;
       transform:translateY(3px);
+      writing-mode:horizontal-tb;
+      rotate:0deg;
+      min-height:0;
+      width:auto;
     }
     nav.tabs button:hover, nav.tabs button.active{ transform:translateY(0); }
     nav.tabs button.active::after{
@@ -537,7 +622,6 @@
     .card{ padding:16px; }
     .bubble{ max-width:82%; }
     .whoami{ font-size:0.72rem; }
-    .whoami img{ width:22px; height:22px; }
   }
   @media (max-width:360px){
     :root{ --book-w: 90vw; }
@@ -580,7 +664,7 @@
         <h1>Our Lavender</h1>
         <svg class="gate-sprig flip" viewBox="0 0 70 210"><use href="#lavSprig"></use></svg>
       </div>
-      <p id="gateTagline">A little corner of the internet just for the two of you. Sign in with the Google account that has access to your shared folder.</p>
+      <p id="gateTagline">A little corner of the internet just for the two of us</p>
       <button class="btn" id="signInBtn">Sign in with Google</button>
 
       <div id="pinUnlock" style="display:none;">
@@ -613,8 +697,13 @@
       <label class="field-label">Add a memory</label>
       <input type="text" id="postCaption" placeholder="Write a little caption...">
       <input type="file" id="postImage" accept="image/*">
+      <div id="postImgPreviewWrap" style="display:none; margin-top:8px; align-items:center; gap:10px;">
+        <img id="postImgPreview" alt="" style="width:60px; height:60px; object-fit:cover; border-radius:8px; box-shadow:var(--shadow);">
+        <button type="button" class="btn ghost small" id="recropBtn">Recrop</button>
+      </div>
       <div class="actions">
-        <span style="font-size:0.72rem;color:var(--plum-2);">Photos are saved into your shared file, so keep them light.</span>
+        <span style="font-size:0.72rem;color:var(--plum-2);">Photos are automatically resized when you pin them, so any size works.</span>
+        <button class="btn small ghost" id="cancelPostEditBtn" style="display:none;">Cancel</button>
         <button class="btn small" id="addPostBtn">Pin it</button>
       </div>
     </div>
@@ -626,7 +715,11 @@
         <h1 id="brandTitle">Our Lavender</h1>
       </div>
       <div class="whoami">
-        <img id="meAvatar" src="" alt="">
+        <button class="btn ghost small icon-btn" id="footerRefreshBtn" aria-label="Refresh from Drive" title="Refresh from Drive">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="15" height="15">
+            <path d="M20 11A8 8 0 1 0 18.5 15.5M20 11V5M20 11H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
         <button class="btn ghost small" id="signOutBtn">Close Book</button>
       </div>
     </div>
@@ -638,8 +731,12 @@
     <div class="card chat-card">
       <div class="chat-head">
         <h2 class="section-title" style="margin:0;">Chat</h2>
-        <span id="chatLiveHint" style="font-size:0.72rem;color:var(--plum-2);">checking every few seconds</span>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span id="chatLiveHint" style="font-size:0.72rem;color:var(--plum-2);">checking every few seconds</span>
+          <button class="btn ghost small" id="requestClearChatBtn">Clear chat</button>
+        </div>
       </div>
+      <div id="chatClearBanner" class="chat-clear-banner" style="display:none;"></div>
       <div id="chatList" class="chat-window"></div>
       <div class="chat-inputbar">
         <input type="text" id="chatInput" placeholder="Type a message...">
@@ -673,6 +770,7 @@
         <textarea id="planNote" placeholder="Optional details..."></textarea>
       </div>
       <div class="actions" style="margin-top:10px; justify-content:flex-end;">
+        <button class="btn small ghost" id="cancelPlanEditBtn" style="display:none;">Cancel</button>
         <button class="btn small" id="addPlanBtn">Add to plans</button>
       </div>
     </div>
@@ -696,6 +794,7 @@
         </div>
       </div>
       <div class="actions" style="margin-top:10px; justify-content:flex-end;">
+        <button class="btn small ghost" id="cancelCountdownEditBtn" style="display:none;">Cancel</button>
         <button class="btn small" id="addCountdownBtn">Add countdown</button>
       </div>
     </div>
@@ -710,27 +809,26 @@
       <h2 class="section-title">Settings</h2>
       <div>
         <label class="field-label">Space name</label>
-        <input type="text" id="spaceName" placeholder="Our Lavender">
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="spaceName" placeholder="Our Lavender" style="flex:1;">
+          <button class="btn small" id="saveSettingsBtn">Save</button>
+        </div>
       </div>
       <div id="syncStatus"><span class="dot" id="syncDot"></span><span id="syncText">Synced</span></div>
-      <div>
-        <button class="btn small ghost" id="refreshBtn">Refresh from Drive</button>
-        <button class="btn small" id="saveSettingsBtn">Save</button>
-      </div>
       <p style="font-size:0.78rem;color:var(--plum-2);">
         Data lives as one JSON file inside your shared Google Drive folder, so both of you always see the same thing.
         Nobody else can read it unless you share the folder further.
       </p>
     </div>
 
-    <div class="card settings-grid" id="displayNameCard" style="display:none;">
-      <h2 class="section-title">Your name</h2>
-      <div>
-        <label class="field-label">How you're shown in posts and chat</label>
-        <input type="text" id="displayNameInput" placeholder="Your name">
-      </div>
+    <div class="card settings-grid" id="nicknameCard" style="display:none;">
+      <h2 class="section-title">Nicknames</h2>
+      <p style="font-size:0.8rem;color:var(--plum-2); margin:0;">
+        Shared between you both — set a nickname and it shows up in Feed and Chat for the other person too.
+      </p>
+      <div id="nicknameInputs"></div>
       <div class="actions" style="justify-content:flex-end;">
-        <button class="btn small" id="saveDisplayNameBtn">Save</button>
+        <button class="btn small" id="saveNicknamesBtn">Save nicknames</button>
       </div>
     </div>
 
@@ -758,6 +856,25 @@
   </div>
 </div>
 
+<div id="cropModal" class="crop-modal">
+  <div class="crop-panel">
+    <h2 class="section-title" style="margin:0 0 12px;">Crop your photo</h2>
+    <div class="crop-stage" id="cropStage">
+      <img id="cropImg" alt="" draggable="false">
+      <div id="cropBox" class="crop-box">
+        <div class="crop-handle" data-corner="nw"></div>
+        <div class="crop-handle" data-corner="ne"></div>
+        <div class="crop-handle" data-corner="sw"></div>
+        <div class="crop-handle" data-corner="se"></div>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:14px; justify-content:flex-end;">
+      <button class="btn small ghost" id="cropCancelBtn">Cancel</button>
+      <button class="btn small" id="cropConfirmBtn">Use this crop</button>
+    </div>
+  </div>
+</div>
+
 <footer class="floaty" id="floaty" style="display:none;">
   <span class="dot" id="floatyDot"></span> <span id="floatyText">synced</span>
 </footer>
@@ -780,6 +897,14 @@ const CONFIG = {
 };
 /* ============================================ */
 
+// The only two people who will ever sign into this app. Their default name
+// is auto-detected from which Google account signs in — no need to ask.
+// Nicknames (set in Settings) override these and are shared between you both.
+const KNOWN_PEOPLE = {
+  "arjuntm3101@gmail.com": "Arjun",
+  "veenaravindran96@gmail.com": "Veena"
+};
+
 let accessToken = null;
 let me = null; // {name, email, picture}
 let fileId = null;
@@ -797,15 +922,9 @@ function uid(){
   return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
 }
 
-/* ---------------- Local device preferences (name + quick-unlock PIN) ----------------
-   These live only in this browser's localStorage — never synced to Drive or seen
-   by the other person. They just reduce friction on this specific device. */
-function getSavedName(email){
-  try{ return localStorage.getItem('ourlavender-name-' + email) || ''; }catch(e){ return ''; }
-}
-function setSavedName(email, name){
-  try{ localStorage.setItem('ourlavender-name-' + email, name); }catch(e){}
-}
+/* ---------------- Local device preferences (quick-unlock PIN only) ----------------
+   The PIN lives only in this browser's localStorage — never synced, never seen
+   by the other person. It just reduces friction on this specific device. */
 function getSavedPin(email){
   try{ return localStorage.getItem('ourlavender-pin-' + email) || ''; }catch(e){ return ''; }
 }
@@ -820,6 +939,18 @@ function getLastEmail(){
 }
 function setLastEmail(email){
   try{ localStorage.setItem('ourlavender-last-email', email); }catch(e){}
+}
+
+/* ---------------- Shared nicknames ----------------
+   Nicknames are stored in the shared Drive file (data.nicknames), keyed by
+   email, so a nickname either of you sets shows up for both of you. */
+function displayNameFor(rawEmail, fallback){
+  if(!rawEmail) return fallback || 'Someone';
+  const email = rawEmail.trim().toLowerCase();
+  const nick = data && data.nicknames && data.nicknames[email];
+  if(nick) return nick;
+  if(KNOWN_PEOPLE[email]) return KNOWN_PEOPLE[email];
+  return fallback || rawEmail.split('@')[0];
 }
 
 function configLooksReady(){
@@ -842,7 +973,7 @@ function setupPinGateIfAvailable(){
   const email = getLastEmail();
   const pin = email ? getSavedPin(email) : '';
   if(!email || !pin) return;
-  const name = getSavedName(email);
+  const name = KNOWN_PEOPLE[email] || '';
   $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}. Enter your PIN to jump back in on this device.`;
   $('#signInBtn').style.display = 'none';
   $('#pinUnlock').style.display = 'flex';
@@ -855,7 +986,7 @@ $('#pinToggleBtn').addEventListener('click', () => {
   $('#signInBtn').style.display = 'inline-block';
   $('#pinUnlock').style.display = 'none';
   $('#pinToggleBtn').style.display = 'none';
-  $('#gateTagline').textContent = "A little corner of the internet just for the two of you. Sign in with the Google account that has access to your shared folder.";
+  $('#gateTagline').textContent = "A little corner of the internet just for the two of us";
 });
 
 async function tryPinUnlock(){
@@ -931,23 +1062,17 @@ async function afterSignIn(){
     headers: { Authorization: 'Bearer ' + accessToken }
   });
   me = await uRes.json();
-  $('#meAvatar').src = me.picture || '';
-
-  // First time this Google account signs in on this device: ask what to call them.
-  let savedName = getSavedName(me.email);
-  if(!savedName){
-    savedName = (prompt("What would you like to be called in the app?", me.name || '') || me.name || '').trim();
-    if(savedName) setSavedName(me.email, savedName);
-  }
-  if(savedName) me.name = savedName;
+  if(me.email) me.email = me.email.trim().toLowerCase();
   setLastEmail(me.email);
 
-  $('#displayNameCard').style.display = 'flex';
-  $('#displayNameInput').value = me.name || '';
+  await loadData(); // brings in data.nicknames from the shared file
+  me.name = displayNameFor(me.email);
+
+  $('#nicknameCard').style.display = 'flex';
+  renderNicknameInputs();
   $('#pinCard').style.display = 'flex';
   $('#newPinInput').value = '';
 
-  await loadData();
   $('#gate').style.display = 'none';
   $('#app').classList.add('shown');
   $('#floaty').style.display = 'flex';
@@ -967,14 +1092,12 @@ function afterSignInMock(){
   me = { name, email: name.toLowerCase().replace(/\s+/g,'') + '@local.test', picture: '' };
   try{ localStorage.setItem(MOCK_ME_KEY, JSON.stringify(me)); }catch(e){}
 
-  $('#meAvatar').style.display = 'none';
-
   try{
     const raw = localStorage.getItem(MOCK_STORAGE_KEY);
     data = raw ? JSON.parse(raw) : blankData();
   }catch(e){ data = blankData(); }
   data.posts ||= []; data.plans ||= []; data.chat ||= [];
-  data.countdowns ||= [];
+  data.countdowns ||= []; data.nicknames ||= {}; data.chatClearRequest = data.chatClearRequest || null;
   if(data.countdown && data.countdown.date){
     data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
     delete data.countdown;
@@ -1003,7 +1126,8 @@ async function driveFindFile(){
 function blankData(){
   return {
     spaceName: "Our Lavender",
-    posts: [], plans: [], chat: [], countdowns: []
+    posts: [], plans: [], chat: [], countdowns: [],
+    nicknames: {}, chatClearRequest: null
   };
 }
 
@@ -1056,7 +1180,7 @@ async function loadData(){
     catch(e){ data = blankData(); }
     if(!data || typeof data !== 'object'){ data = blankData(); }
     data.posts ||= []; data.plans ||= []; data.chat ||= [];
-    data.countdowns ||= [];
+    data.countdowns ||= []; data.nicknames ||= {}; data.chatClearRequest = data.chatClearRequest || null;
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1109,7 +1233,7 @@ async function refreshFromDrive(){
   try{
     data = await driveGetContent(fileId);
     data.posts ||= []; data.plans ||= []; data.chat ||= [];
-    data.countdowns ||= [];
+    data.countdowns ||= []; data.nicknames ||= {}; data.chatClearRequest = data.chatClearRequest || null;
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1171,32 +1295,244 @@ function fileToDataUrl(file){
   });
 }
 
+// Resizes and compresses an image file in the browser before it's ever saved,
+// so people don't have to manually shrink photos before pinning them.
+// Tries progressively smaller/more compressed passes until it's comfortably
+// small, so even big phone-camera photos end up as a light JPEG.
+function loadImage(dataUrl){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => res(img);
+    img.onerror = rej;
+    img.src = dataUrl;
+  });
+}
+
+async function compressImageElement(img){
+  const attempts = [
+    { maxDim: 1600, quality: 0.82 },
+    { maxDim: 1280, quality: 0.72 },
+    { maxDim: 1024, quality: 0.62 },
+    { maxDim: 800,  quality: 0.55 }
+  ];
+  const targetBytes = 900 * 1024; // aim comfortably under the shared-file budget
+
+  let result = null;
+  for(const { maxDim, quality } of attempts){
+    let { width, height } = img;
+    if(width > maxDim || height > maxDim){
+      if(width > height){ height = Math.round(height * (maxDim / width)); width = maxDim; }
+      else { width = Math.round(width * (maxDim / height)); height = maxDim; }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = width; canvas.height = height;
+    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+    result = dataUrl;
+    // base64 is ~33% bigger than raw bytes; estimate the real size from string length
+    const approxBytes = dataUrl.length * 0.75;
+    if(approxBytes <= targetBytes) break;
+  }
+  return result;
+}
+
+async function resizeImageFile(file){
+  const rawDataUrl = await fileToDataUrl(file);
+  const img = await loadImage(rawDataUrl);
+  return compressImageElement(img);
+}
+
+/* ---------------- Crop modal ---------------- */
+let cropBoxRect = { x:0, y:0, w:100, h:100 }; // pixel coords relative to the displayed image
+let cropDrag = null;
+let cropResolve = null;
+let pendingCroppedImg = null;
+
+function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+function imgDisplayRect(){
+  const imgEl = $('#cropImg');
+  const stageEl = $('#cropStage');
+  const imgRect = imgEl.getBoundingClientRect();
+  const stageRect = stageEl.getBoundingClientRect();
+  return {
+    offsetLeft: imgRect.left - stageRect.left,
+    offsetTop: imgRect.top - stageRect.top,
+    width: imgEl.clientWidth,
+    height: imgEl.clientHeight
+  };
+}
+
+function updateCropBoxUI(){
+  const d = imgDisplayRect();
+  const box = $('#cropBox');
+  box.style.left = (d.offsetLeft + cropBoxRect.x) + 'px';
+  box.style.top = (d.offsetTop + cropBoxRect.y) + 'px';
+  box.style.width = cropBoxRect.w + 'px';
+  box.style.height = cropBoxRect.h + 'px';
+}
+
+function openCropModal(dataUrl){
+  return new Promise((resolve) => {
+    cropResolve = resolve;
+    const imgEl = $('#cropImg');
+    imgEl.onload = () => {
+      const w = imgEl.clientWidth, h = imgEl.clientHeight;
+      const bw = w * 0.8, bh = h * 0.8;
+      cropBoxRect = { x: (w - bw) / 2, y: (h - bh) / 2, w: bw, h: bh };
+      updateCropBoxUI();
+      $('#cropModal').classList.add('open');
+    };
+    imgEl.src = dataUrl;
+  });
+}
+
+function closeCropModal(result){
+  $('#cropModal').classList.remove('open');
+  if(cropResolve){ cropResolve(result); cropResolve = null; }
+}
+
+$('#cropBox').addEventListener('pointerdown', (e) => {
+  if(e.target.classList.contains('crop-handle')) return;
+  cropDrag = { mode:'move', startX:e.clientX, startY:e.clientY, startBox:{...cropBoxRect} };
+  e.target.setPointerCapture(e.pointerId);
+});
+$all('.crop-handle').forEach(h => {
+  h.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    cropDrag = { mode:h.dataset.corner, startX:e.clientX, startY:e.clientY, startBox:{...cropBoxRect} };
+    h.setPointerCapture(e.pointerId);
+  });
+});
+window.addEventListener('pointermove', (e) => {
+  if(!cropDrag) return;
+  const d = imgDisplayRect();
+  const dx = e.clientX - cropDrag.startX;
+  const dy = e.clientY - cropDrag.startY;
+  const sb = cropDrag.startBox;
+  const minSize = 40;
+  let { x, y, w, h } = sb;
+
+  if(cropDrag.mode === 'move'){
+    x = clamp(sb.x + dx, 0, d.width - sb.w);
+    y = clamp(sb.y + dy, 0, d.height - sb.h);
+  } else {
+    if(cropDrag.mode.includes('n')){
+      const bottom = sb.y + sb.h;
+      y = clamp(sb.y + dy, 0, bottom - minSize);
+      h = bottom - y;
+    }
+    if(cropDrag.mode.includes('s')){
+      const newBottom = clamp(sb.y + sb.h + dy, sb.y + minSize, d.height);
+      h = newBottom - sb.y;
+    }
+    if(cropDrag.mode.includes('w')){
+      const right = sb.x + sb.w;
+      x = clamp(sb.x + dx, 0, right - minSize);
+      w = right - x;
+    }
+    if(cropDrag.mode.includes('e')){
+      const newRight = clamp(sb.x + sb.w + dx, sb.x + minSize, d.width);
+      w = newRight - sb.x;
+    }
+  }
+  cropBoxRect = { x, y, w, h };
+  updateCropBoxUI();
+});
+window.addEventListener('pointerup', () => { cropDrag = null; });
+
+$('#cropCancelBtn').addEventListener('click', () => closeCropModal(null));
+
+$('#cropConfirmBtn').addEventListener('click', async () => {
+  const imgEl = $('#cropImg');
+  const scaleX = imgEl.naturalWidth / imgEl.clientWidth;
+  const scaleY = imgEl.naturalHeight / imgEl.clientHeight;
+  const sx = cropBoxRect.x * scaleX;
+  const sy = cropBoxRect.y * scaleY;
+  const sw = Math.max(1, Math.round(cropBoxRect.w * scaleX));
+  const sh = Math.max(1, Math.round(cropBoxRect.h * scaleY));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = sw; canvas.height = sh;
+  canvas.getContext('2d').drawImage(imgEl, sx, sy, sw, sh, 0, 0, sw, sh);
+
+  const btn = $('#cropConfirmBtn');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Processing...';
+  try{
+    const croppedImg = await loadImage(canvas.toDataURL('image/png'));
+    const compressed = await compressImageElement(croppedImg);
+    closeCropModal(compressed);
+  } finally {
+    btn.disabled = false; btn.textContent = original;
+  }
+});
+
+let lastRawImageDataUrl = null;
+$('#postImage').addEventListener('change', async () => {
+  const file = $('#postImage').files[0];
+  if(!file) return;
+  const rawDataUrl = await fileToDataUrl(file);
+  lastRawImageDataUrl = rawDataUrl;
+  const cropped = await openCropModal(rawDataUrl);
+  if(cropped){
+    pendingCroppedImg = cropped;
+    $('#postImgPreview').src = cropped;
+    $('#postImgPreviewWrap').style.display = 'flex';
+  } else {
+    // cancelled — clear the selection so it doesn't look like a photo is staged
+    $('#postImage').value = '';
+    pendingCroppedImg = null;
+    $('#postImgPreviewWrap').style.display = 'none';
+  }
+});
+
+$('#recropBtn').addEventListener('click', async () => {
+  if(!lastRawImageDataUrl) return;
+  const cropped = await openCropModal(lastRawImageDataUrl);
+  if(cropped){
+    pendingCroppedImg = cropped;
+    $('#postImgPreview').src = cropped;
+  }
+});
+
 $('#addPostBtn').addEventListener('click', async () => {
+  const btn = $('#addPostBtn');
+  const wasEditing = editingPostId;
+  const originalLabel = wasEditing ? 'Save changes' : 'Pin it';
   try{
     const caption = $('#postCaption').value.trim();
     const fileInput = $('#postImage');
-    let img = null;
-    if(fileInput.files[0]){
-      if(fileInput.files[0].size > 1.5 * 1024 * 1024){
-        alert("That photo is a bit large for this. Try one under ~1.5MB so the shared file stays quick to sync.");
-        return;
-      }
-      img = await fileToDataUrl(fileInput.files[0]);
+    let img = wasEditing ? data.posts.find(x => x.id === wasEditing)?.img : null;
+    if(pendingCroppedImg){
+      img = pendingCroppedImg;
     }
     if(!caption && !img){
       alert("Add a caption or a photo before pinning.");
       return;
     }
-    data.posts.unshift({
-      id: uid(), caption, img,
-      author: me.name, authorEmail: me.email, ts: Date.now()
-    });
-    $('#postCaption').value = ''; fileInput.value = '';
+    if(wasEditing){
+      const post = data.posts.find(x => x.id === wasEditing);
+      if(post){ post.caption = caption; post.img = img; }
+      cancelPostEdit();
+    } else {
+      data.posts.unshift({
+        id: uid(), caption, img,
+        author: me.name, authorEmail: me.email, ts: Date.now()
+      });
+      $('#postCaption').value = ''; fileInput.value = '';
+    }
+    pendingCroppedImg = null;
+    lastRawImageDataUrl = null;
+    $('#postImgPreviewWrap').style.display = 'none';
     renderFeed();
     await persist();
   }catch(err){
     console.error(err);
     alert("Couldn't pin that: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
   }
 });
 
@@ -1208,18 +1544,55 @@ function renderFeed(){
     el.className = 'post';
     el.innerHTML = `
       <div class="tape"></div>
-      <button class="post-del" data-id="${p.id}" aria-label="Remove">✕</button>
+      <div class="post-actions">
+        <button class="post-edit" data-id="${p.id}" aria-label="Edit">✎</button>
+        <button class="post-del" data-id="${p.id}" aria-label="Remove">✕</button>
+      </div>
       ${p.img ? `<img src="${p.img}" alt="">` : ''}
       ${p.caption ? `<div class="cap">${escapeHtml(p.caption)}</div>` : ''}
-      <div class="meta"><span>${escapeHtml(p.author||'')}</span><span>${fmtDate(p.ts)}</span></div>
+      <div class="meta"><span>${escapeHtml(displayNameFor(p.authorEmail, p.author))}</span><span>${fmtDate(p.ts)}</span></div>
     `;
     el.querySelector('.post-del').addEventListener('click', () => {
+      if(!confirm("Remove this from the feed? This can't be undone.")) return;
       data.posts = data.posts.filter(x => x.id !== p.id);
+      if(editingPostId === p.id) cancelPostEdit();
       renderFeed(); persist();
     });
+    el.querySelector('.post-edit').addEventListener('click', () => startPostEdit(p));
     list.appendChild(el);
   });
 }
+
+let editingPostId = null;
+function startPostEdit(p){
+  editingPostId = p.id;
+  $('#postCaption').value = p.caption || '';
+  $('#addPostBtn').textContent = 'Save changes';
+  $('#cancelPostEditBtn').style.display = 'inline-block';
+  if(p.img){
+    pendingCroppedImg = p.img;
+    lastRawImageDataUrl = p.img;
+    $('#postImgPreview').src = p.img;
+    $('#postImgPreviewWrap').style.display = 'flex';
+  } else {
+    pendingCroppedImg = null;
+    lastRawImageDataUrl = null;
+    $('#postImgPreviewWrap').style.display = 'none';
+  }
+  $('#postCaption').scrollIntoView({ behavior:'smooth', block:'center' });
+  $('#postCaption').focus();
+}
+function cancelPostEdit(){
+  editingPostId = null;
+  $('#postCaption').value = '';
+  $('#postImage').value = '';
+  pendingCroppedImg = null;
+  lastRawImageDataUrl = null;
+  $('#postImgPreviewWrap').style.display = 'none';
+  $('#addPostBtn').textContent = 'Pin it';
+  $('#cancelPostEditBtn').style.display = 'none';
+}
+$('#cancelPostEditBtn').addEventListener('click', cancelPostEdit);
 
 /* ---------------- Chat ---------------- */
 function sendChat(){
@@ -1253,6 +1626,7 @@ function dayLabel(ts){
 }
 
 function renderChat(){
+  renderChatClearBanner();
   const list = $('#chatList');
   if(!list) return;
   const wasNearBottom = (list.scrollHeight - list.scrollTop - list.clientHeight) < 60;
@@ -1275,16 +1649,18 @@ function renderChat(){
     const row = document.createElement('div');
     row.className = 'chat-row ' + (mine ? 'mine' : 'theirs') + ' ' + (grouped ? 'grouped' : 'new-group');
 
+    const nameNow = displayNameFor(m.authorEmail, m.author);
+
     const avatar = document.createElement('div');
     avatar.className = 'chat-avatar ' + (mine ? 'mine' : 'theirs') + (grouped ? ' spacer' : '');
-    avatar.textContent = initials(m.author);
+    avatar.textContent = initials(nameNow);
 
     const col = document.createElement('div');
     col.className = 'bubble-col';
     col.innerHTML = `
-      ${!grouped ? `<span class="bubble-who">${escapeHtml(m.author||'')}</span>` : ''}
+      ${!grouped ? `<span class="bubble-who">${escapeHtml(nameNow)}</span>` : ''}
       <div class="bubble ${mine ? 'mine' : 'theirs'}">${escapeHtml(m.text)}</div>
-      <span class="ts">${fmtDate(m.ts)}</span>
+      <span class="ts">${fmtTime(m.ts)}</span>
     `;
     col.addEventListener('click', () => col.classList.toggle('show-ts'));
 
@@ -1298,6 +1674,66 @@ function renderChat(){
   }
 }
 
+function renderChatClearBanner(){
+  const banner = $('#chatClearBanner');
+  if(!banner) return;
+  const req = data && data.chatClearRequest;
+  if(!req){
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+  banner.style.display = 'flex';
+  if(me && req.by === me.email){
+    banner.innerHTML = `
+      <span>Waiting for ${escapeHtml(otherPersonLabel())} to agree to clear the chat...</span>
+      <div class="actions-inline"><button class="no-btn" id="cancelClearReqBtn">Cancel request</button></div>
+    `;
+    $('#cancelClearReqBtn').addEventListener('click', () => {
+      data.chatClearRequest = null;
+      persist();
+      renderChatClearBanner();
+    });
+  } else {
+    const reqName = displayNameFor(req.by);
+    banner.innerHTML = `
+      <span>${escapeHtml(reqName)} wants to clear the chat. Agree?</span>
+      <div class="actions-inline">
+        <button class="no-btn" id="declineClearBtn">No</button>
+        <button class="yes-btn" id="approveClearBtn">Yes, clear it</button>
+      </div>
+    `;
+    $('#declineClearBtn').addEventListener('click', () => {
+      data.chatClearRequest = null;
+      persist();
+      renderChatClearBanner();
+    });
+    $('#approveClearBtn').addEventListener('click', () => {
+      data.chat = [];
+      data.chatClearRequest = null;
+      persist();
+      renderChat();
+    });
+  }
+}
+
+function otherPersonLabel(){
+  const otherEmail = Object.keys(KNOWN_PEOPLE).find(e => e !== (me && me.email));
+  return otherEmail ? displayNameFor(otherEmail) : 'the other person';
+}
+
+$('#requestClearChatBtn').addEventListener('click', () => {
+  if(!me) return;
+  if(data.chatClearRequest){
+    alert("There's already a pending clear-chat request.");
+    return;
+  }
+  if(!confirm("Ask to clear the whole chat? It'll only actually clear once the other person agrees.")) return;
+  data.chatClearRequest = { by: me.email, ts: Date.now() };
+  persist();
+  renderChatClearBanner();
+});
+
 
 let chatPollTimer = null;
 function startChatPolling(){
@@ -1309,6 +1745,7 @@ function startChatPolling(){
         if(raw){
           const fresh = JSON.parse(raw);
           data.chat = fresh.chat || data.chat;
+          data.chatClearRequest = fresh.chatClearRequest || null;
           renderChat();
         }
       }catch(e){}
@@ -1316,6 +1753,7 @@ function startChatPolling(){
       try{
         const fresh = await driveGetContent(fileId);
         data.chat = fresh.chat || data.chat;
+        data.chatClearRequest = fresh.chatClearRequest || null;
         renderChat();
       }catch(e){}
     }
@@ -1324,15 +1762,39 @@ function startChatPolling(){
 function stopChatPolling(){ if(chatPollTimer){ clearInterval(chatPollTimer); chatPollTimer = null; } }
 
 /* ---------------- Plans ---------------- */
+let editingPlanId = null;
 $('#addPlanBtn').addEventListener('click', () => {
   const date = $('#planDate').value;
   const title = $('#planTitle').value.trim();
   const note = $('#planNote').value.trim();
   if(!date || !title) return;
-  data.plans.push({ id: uid(), date, title, note, addedBy: me.name });
-  $('#planDate').value=''; $('#planTitle').value=''; $('#planNote').value='';
+  if(editingPlanId){
+    const plan = data.plans.find(x => x.id === editingPlanId);
+    if(plan){ plan.date = date; plan.title = title; plan.note = note; }
+    cancelPlanEdit();
+  } else {
+    data.plans.push({ id: uid(), date, title, note, addedBy: me.name });
+    $('#planDate').value=''; $('#planTitle').value=''; $('#planNote').value='';
+  }
   renderPlans(); persist();
 });
+
+function startPlanEdit(p){
+  editingPlanId = p.id;
+  $('#planDate').value = p.date;
+  $('#planTitle').value = p.title;
+  $('#planNote').value = p.note || '';
+  $('#addPlanBtn').textContent = 'Save changes';
+  $('#cancelPlanEditBtn').style.display = 'inline-block';
+  $('#planTitle').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function cancelPlanEdit(){
+  editingPlanId = null;
+  $('#planDate').value=''; $('#planTitle').value=''; $('#planNote').value='';
+  $('#addPlanBtn').textContent = 'Add to plans';
+  $('#cancelPlanEditBtn').style.display = 'none';
+}
+$('#cancelPlanEditBtn').addEventListener('click', cancelPlanEdit);
 
 function renderPlans(){
   const list = $('#plansList');
@@ -1345,25 +1807,52 @@ function renderPlans(){
     el.innerHTML = `
       <div class="datebox"><div class="d">${d.getDate()}</div><div class="m">${d.toLocaleString(undefined,{month:'short'})}</div></div>
       <div class="content"><strong>${escapeHtml(p.title)}</strong>${p.note ? `<p>${escapeHtml(p.note)}</p>` : ''}</div>
-      <button class="del" data-id="${p.id}">✕</button>
+      <button class="edit" data-id="${p.id}" aria-label="Edit">✎</button>
+      <button class="del" data-id="${p.id}" aria-label="Remove">✕</button>
     `;
     el.querySelector('.del').addEventListener('click', () => {
+      if(!confirm(`Remove "${p.title}" from your plans? This can't be undone.`)) return;
       data.plans = data.plans.filter(x => x.id !== p.id);
+      if(editingPlanId === p.id) cancelPlanEdit();
       renderPlans(); persist();
     });
+    el.querySelector('.edit').addEventListener('click', () => startPlanEdit(p));
     list.appendChild(el);
   });
 }
 
 /* ---------------- Countdown ---------------- */
+let editingCountdownId = null;
 $('#addCountdownBtn').addEventListener('click', () => {
   const label = $('#cdLabel').value.trim();
   const date = $('#cdDate').value;
   if(!label || !date) return;
-  data.countdowns.push({ id: uid(), label, date });
-  $('#cdLabel').value = ''; $('#cdDate').value = '';
+  if(editingCountdownId){
+    const c = data.countdowns.find(x => x.id === editingCountdownId);
+    if(c){ c.label = label; c.date = date; }
+    cancelCountdownEdit();
+  } else {
+    data.countdowns.push({ id: uid(), label, date });
+    $('#cdLabel').value = ''; $('#cdDate').value = '';
+  }
   renderCountdown(); persist();
 });
+
+function startCountdownEdit(c){
+  editingCountdownId = c.id;
+  $('#cdLabel').value = c.label;
+  $('#cdDate').value = c.date;
+  $('#addCountdownBtn').textContent = 'Save changes';
+  $('#cancelCountdownEditBtn').style.display = 'inline-block';
+  $('#cdLabel').scrollIntoView({ behavior:'smooth', block:'center' });
+}
+function cancelCountdownEdit(){
+  editingCountdownId = null;
+  $('#cdLabel').value = ''; $('#cdDate').value = '';
+  $('#addCountdownBtn').textContent = 'Add countdown';
+  $('#cancelCountdownEditBtn').style.display = 'none';
+}
+$('#cancelCountdownEditBtn').addEventListener('click', cancelCountdownEdit);
 
 function renderCountdown(){
   const list = $('#countdownList');
@@ -1371,11 +1860,15 @@ function renderCountdown(){
     list.innerHTML = '<div class="countdown-empty">Add your first occasion above 💜</div>';
     return;
   }
-  const now = new Date();
+  // Compare calendar dates only (ignore time-of-day) so the count is
+  // consistent no matter what time you happen to check it.
+  const today = new Date();
+  const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const withDiff = data.countdowns.map(c => {
-    const target = new Date(c.date + 'T00:00:00');
-    const diffDays = Math.ceil((target - now) / 86400000);
-    return { ...c, diffDays };
+    const [y, m, d] = c.date.split('-').map(Number);
+    const target = new Date(y, m - 1, d);
+    const diffDays = Math.round((target - todayMid) / 86400000);
+    return { ...c, diffDays, targetDate: target };
   });
   // soonest upcoming first, then today, then past events last
   withDiff.sort((a, b) => {
@@ -1392,21 +1885,40 @@ function renderCountdown(){
     if(c.diffDays > 0){ num = c.diffDays; sub = c.diffDays === 1 ? 'day to go' : 'days to go'; }
     else if(c.diffDays === 0){ num = '🎉'; sub = "it's today!"; }
     else { num = Math.abs(c.diffDays); sub = c.diffDays === -1 ? 'day ago' : 'days ago'; }
+    const dateStr = c.targetDate.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric', year:'numeric' });
     el.innerHTML = `
       <div class="cd-num">${num}</div>
       <div class="cd-info">
         <div class="cd-label">${escapeHtml(c.label)}</div>
         <div class="cd-sub">${sub}</div>
+        <div class="cd-date">${dateStr}</div>
       </div>
+      <button class="edit" data-id="${c.id}" aria-label="Edit">✎</button>
       <button class="del" data-id="${c.id}">✕</button>
     `;
     el.querySelector('.del').addEventListener('click', () => {
+      if(!confirm(`Remove "${c.label}" from your countdowns? This can't be undone.`)) return;
       data.countdowns = data.countdowns.filter(x => x.id !== c.id);
+      if(editingCountdownId === c.id) cancelCountdownEdit();
       renderCountdown(); persist();
     });
+    el.querySelector('.edit').addEventListener('click', () => startCountdownEdit(c));
     list.appendChild(el);
   });
 }
+
+let midnightRefreshTimer = null;
+function scheduleCountdownMidnightRefresh(){
+  clearTimeout(midnightRefreshTimer);
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+  const msUntilMidnight = nextMidnight - now;
+  midnightRefreshTimer = setTimeout(() => {
+    if(data) renderCountdown();
+    scheduleCountdownMidnightRefresh(); // reschedule for the following midnight
+  }, msUntilMidnight);
+}
+scheduleCountdownMidnightRefresh();
 
 /* ---------------- Settings ---------------- */
 $('#saveSettingsBtn').addEventListener('click', () => {
@@ -1415,15 +1927,43 @@ $('#saveSettingsBtn').addEventListener('click', () => {
   $('#brandTitle').textContent = data.spaceName;
   persist();
 });
-$('#refreshBtn').addEventListener('click', () => { refreshFromDrive().then(renderAll); });
+$('#footerRefreshBtn').addEventListener('click', async () => {
+  const btn = $('#footerRefreshBtn');
+  if(btn.classList.contains('spinning')) return;
+  btn.classList.add('spinning');
+  try{
+    await refreshFromDrive();
+    renderAll();
+  } finally {
+    btn.classList.remove('spinning');
+  }
+});
 
-$('#saveDisplayNameBtn').addEventListener('click', () => {
-  if(!me || !me.email) return;
-  const name = $('#displayNameInput').value.trim();
-  if(!name){ alert("Enter a name first."); return; }
-  setSavedName(me.email, name);
-  me.name = name;
-  alert("Saved. New posts and messages will show this name.");
+function renderNicknameInputs(){
+  const wrap = $('#nicknameInputs');
+  if(!wrap) return;
+  wrap.innerHTML = Object.keys(KNOWN_PEOPLE).map(email => `
+    <div style="margin-top:10px;">
+      <label class="field-label">${escapeHtml(KNOWN_PEOPLE[email])}'s nickname</label>
+      <input type="text" class="nickname-input" data-email="${email}"
+        placeholder="${escapeHtml(KNOWN_PEOPLE[email])}"
+        value="${escapeHtml((data.nicknames && data.nicknames[email]) || '')}">
+    </div>
+  `).join('');
+}
+
+$('#saveNicknamesBtn').addEventListener('click', () => {
+  data.nicknames ||= {};
+  $all('.nickname-input').forEach(input => {
+    const email = input.dataset.email;
+    const val = input.value.trim();
+    if(val) data.nicknames[email] = val;
+    else delete data.nicknames[email];
+  });
+  if(me && me.email) me.name = displayNameFor(me.email);
+  renderAll();
+  persist();
+  alert("Nicknames saved — updated everywhere for both of you.");
 });
 
 $('#savePinBtn').addEventListener('click', () => {
@@ -1453,6 +1993,10 @@ function fmtDate(ts){
   if(!ts) return '';
   const d = new Date(ts);
   return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' · ' + d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+}
+function fmtTime(ts){
+  if(!ts) return '';
+  return new Date(ts).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
 }
 function escapeHtml(s){
   return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
