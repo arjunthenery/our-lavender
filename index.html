@@ -27,7 +27,7 @@
     --line: rgba(125,92,151,0.14);
     --shadow: 0 10px 26px rgba(125,92,151,0.14);
     --book-w: min(96vw, 620px);
-    --book-h: min(84vh, 760px);
+    --book-h: min(88vh, 820px);
   }
   html, body{ overflow-x:hidden; }
   *{box-sizing:border-box;}
@@ -186,6 +186,8 @@
     max-width:900px; margin:0 auto; padding:20px 18px 16px;
     height:100vh; height:100dvh;
     flex-direction:column;
+    align-items:center;
+    justify-content:center;
     box-sizing:border-box;
   }
   #app.shown{ display:flex; }
@@ -301,8 +303,8 @@
     width:calc(var(--book-w) + 16px + 54px);
     max-width:100%;
     margin:0 auto;
-    flex:1;
-    min-height:0;
+    flex:0 0 auto;
+    max-height:100%;
     display:flex;
     flex-direction:row;
     align-items:stretch;
@@ -316,10 +318,9 @@
     border-radius:0 14px 14px 14px;
     padding:20px 20px 6px;
     width:var(--book-w);
-    max-height:var(--book-h);
+    height:var(--book-h);
     max-width:100%;
     flex:1;
-    min-height:0;
     order:1;
     box-shadow:
       7px 7px 0 -3px var(--paper-2),
@@ -622,7 +623,7 @@
   .crop-handle[data-corner="se"]{ top:100%; left:100%; cursor:nwse-resize; }
 
   @media (max-width:560px){
-    :root{ --book-w: 84vw; --book-h: min(74vh, 660px); }
+    :root{ --book-w: 84vw; --book-h: min(78vh, 700px); }
     .book.tabs-hidden{ --book-w: 95vw; }
     .note{ max-width:92%; }
     .plan{ flex-wrap:wrap; }
