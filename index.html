@@ -66,6 +66,19 @@
     padding:10px;
     box-sizing:border-box;
   }
+  .copyright-cover{
+    position:absolute; left:0; right:0; bottom:8px;
+    text-align:center; font-size:0.72rem; letter-spacing:0.01em;
+    color:#2B1B24; opacity:0.35;
+    pointer-events:none; font-family:'Nunito Sans',sans-serif;
+  }
+  .copyright-page{
+    position:absolute; left:0; right:0; bottom:0;
+    text-align:center; font-size:0.72rem; letter-spacing:0.01em;
+    color:#2B1B24; opacity:0.28;
+    pointer-events:none; font-family:'Nunito Sans',sans-serif;
+    z-index:0;
+  }
   .book-cover{
     position:relative;
     width:var(--book-w);
@@ -692,13 +705,14 @@
     <div class="ribbon"></div>
     <div class="book-cover-inner">
       <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
-        <svg class="gate-sprig-top" viewBox="0 0 70 210"><use href="#lavSprig"></use></svg>
+        <svg class="gate-sprig-top" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>
         <h1>Our Lavender</h1>
       </div>
       <p id="gateTagline">A little corner of the internet just for the two of us</p>
       <button class="btn" id="signInBtn">Sign in with Google</button>
 
       <div id="configNotice"></div>
+      <div class="copyright-cover">© 2026 Arjun Thenery Maniknatan</div>
     </div>
   </div>
 </div>
@@ -715,6 +729,7 @@
 
   <div class="panel-stage">
   <div class="tab-dots" id="tabDots"></div>
+  <div class="copyright-page">© 2026 Arjun Thenery Maniknatan</div>
   <!-- FEED -->
   <section class="panel active" id="panel-feed">
     <div class="panel-content">
@@ -738,7 +753,7 @@
     </div>
     <div class="book-footer" id="pageFooter">
       <div class="brand">
-        <svg width="16" height="48" viewBox="0 0 70 210" style="flex-shrink:0;"><use href="#lavSprig"></use></svg>
+        <svg width="16" height="48" viewBox="0 0 70 210" style="flex-shrink:0;"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>
         <h1 id="brandTitle">Our Lavender</h1>
         <span class="who-badge" id="whoBadge">?</span>
       </div>
