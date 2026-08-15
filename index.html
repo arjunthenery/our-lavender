@@ -691,7 +691,7 @@
 
       <div id="pinUnlock" style="display:none;">
         <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="pinInput" placeholder="Enter your PIN">
-        <button class="btn" id="pinUnlockBtn">Unlock</button>
+        <button class="btn" id="pinUnlockBtn">Open Book</button>
       </div>
       <button class="btn ghost small" id="pinToggleBtn" style="display:none; margin-top:10px;"></button>
 
@@ -1004,19 +1004,32 @@ window.addEventListener('load', () => {
 
 function setupPinGateIfAvailable(){
   const email = getLastEmail();
-  const pin = email ? getSavedPin(email) : '';
-  if(!email || !pin) return;
+  if(!email) return; // never signed in on this device — leave the default "Sign in with Google" flow
+  const pin = getSavedPin(email);
   const name = KNOWN_PEOPLE[email] || '';
-  $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}. Enter your PIN to jump back in on this device.`;
-  $('#signInBtn').style.display = 'none';
-  $('#pinUnlock').style.display = 'flex';
-  $('#pinToggleBtn').style.display = 'inline-block';
-  $('#pinToggleBtn').textContent = 'Use Google sign-in instead';
-  $('#pinInput').focus();
+
+  if(pin){
+    // Returning, PIN protected: enter PIN, then "Open Book" quietly re-authenticates.
+    $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}. Enter your PIN to open the book.`;
+    $('#signInBtn').style.display = 'none';
+    $('#pinUnlock').style.display = 'flex';
+    $('#pinToggleBtn').style.display = 'inline-block';
+    $('#pinToggleBtn').textContent = 'Use Google sign-in instead';
+    $('#pinInput').focus();
+  } else {
+    // Returning, no PIN: a single "Open Book" tap quietly re-authenticates, no account picker.
+    $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}.`;
+    $('#signInBtn').textContent = 'Open Book';
+    $('#signInBtn').dataset.quickReopen = 'true';
+    $('#pinToggleBtn').style.display = 'inline-block';
+    $('#pinToggleBtn').textContent = 'Sign in with a different account';
+  }
 }
 
 $('#pinToggleBtn').addEventListener('click', () => {
   $('#signInBtn').style.display = 'inline-block';
+  $('#signInBtn').textContent = 'Sign in with Google';
+  delete $('#signInBtn').dataset.quickReopen;
   $('#pinUnlock').style.display = 'none';
   $('#pinToggleBtn').style.display = 'none';
   $('#gateTagline').textContent = "A little corner of the internet just for the two of us";
@@ -1079,7 +1092,13 @@ $('#signInBtn').addEventListener('click', () => {
     return;
   }
   if(!tokenClient){ alert("Still loading Google sign-in, try again in a second."); return; }
-  tokenClient.requestAccessToken();
+  if($('#signInBtn').dataset.quickReopen === 'true'){
+    const email = getLastEmail();
+    pendingPinUnlockEmail = email;
+    tokenClient.requestAccessToken({ prompt: '', hint: email });
+  } else {
+    tokenClient.requestAccessToken();
+  }
 });
 
 $('#signOutBtn').addEventListener('click', () => {
