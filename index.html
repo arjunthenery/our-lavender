@@ -799,16 +799,6 @@
       </p>
     </div>
 
-    <div class="card settings-grid" id="nicknameCard" style="display:none;">
-      <h2 class="section-title">Nicknames</h2>
-      <p style="font-size:0.8rem;color:var(--plum-2); margin:0;">
-        Shared between you both — set a nickname and it shows up in Feed for the other person too.
-      </p>
-      <div id="nicknameInputs"></div>
-      <div class="actions" style="justify-content:flex-end;">
-        <button class="btn small" id="saveNicknamesBtn">Save nicknames</button>
-      </div>
-    </div>
     </div>
   </section>
   </div>
@@ -856,9 +846,8 @@ const CONFIG = {
 };
 /* ============================================ */
 
-// The only two people who will ever sign into this app. Their default name
-// is auto-detected from which Google account signs in — no need to ask.
-// Nicknames (set in Settings) override these and are shared between you both.
+// The only two people who will ever sign into this app. Their name is
+// auto-detected from which Google account signs in — no need to ask.
 const KNOWN_PEOPLE = {
   "arjuntm3101@gmail.com": "Juju",
   "veenaravindran96@gmail.com": "Veenchi"
@@ -881,17 +870,9 @@ function uid(){
   return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
 }
 
-/* ---------------- Local device preferences (quick-unlock PIN only) ----------------
-   The PIN lives only in this browser's localStorage — never synced, never seen
-   by the other person. It just reduces friction on this specific device. */
-/* ---------------- Shared nicknames ----------------
-   Nicknames are stored in the shared Drive file (data.nicknames), keyed by
-   email, so a nickname either of you sets shows up for both of you. */
 function displayNameFor(rawEmail, fallback){
   if(!rawEmail) return fallback || 'Someone';
   const email = rawEmail.trim().toLowerCase();
-  const nick = data && data.nicknames && data.nicknames[email];
-  if(nick) return nick;
   if(KNOWN_PEOPLE[email]) return KNOWN_PEOPLE[email];
   return fallback || rawEmail.split('@')[0];
 }
@@ -965,12 +946,9 @@ async function afterSignIn(){
   me = await uRes.json();
   if(me.email) me.email = me.email.trim().toLowerCase();
 
-  await loadData(); // brings in data.nicknames from the shared file
+  await loadData();
   me.name = displayNameFor(me.email);
   updateWhoBadge();
-
-  $('#nicknameCard').style.display = 'flex';
-  renderNicknameInputs();
 
   $('#gate').style.display = 'none';
   $('#app').classList.add('shown');
@@ -997,7 +975,7 @@ function afterSignInMock(){
     data = raw ? JSON.parse(raw) : blankData();
   }catch(e){ data = blankData(); }
   data.posts ||= []; data.plans ||= [];
-  data.countdowns ||= []; data.nicknames ||= {};
+  data.countdowns ||= [];
   if(data.countdown && data.countdown.date){
     data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
     delete data.countdown;
@@ -1026,8 +1004,7 @@ async function driveFindFile(){
 function blankData(){
   return {
     spaceName: "Our Lavender",
-    posts: [], plans: [], countdowns: [],
-    nicknames: {}
+    posts: [], plans: [], countdowns: []
   };
 }
 
@@ -1080,7 +1057,7 @@ async function loadData(){
     catch(e){ data = blankData(); }
     if(!data || typeof data !== 'object'){ data = blankData(); }
     data.posts ||= []; data.plans ||= [];
-    data.countdowns ||= []; data.nicknames ||= {};
+    data.countdowns ||= [];
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1157,7 +1134,7 @@ async function refreshFromDrive(){
   try{
     data = await driveGetContent(fileId);
     data.posts ||= []; data.plans ||= [];
-    data.countdowns ||= []; data.nicknames ||= {};
+    data.countdowns ||= [];
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1403,7 +1380,10 @@ function openCropModal(dataUrl){
     const imgEl = $('#cropImg');
     imgEl.onload = () => {
       const w = imgEl.clientWidth, h = imgEl.clientHeight;
-      const bw = w * 0.8, bh = h * 0.8;
+      // Start as a small square centered in the middle — easy to grab and
+      // drag from there, rather than starting nearly full-size with no room to move.
+      const side = Math.min(w, h) * 0.4;
+      const bw = side, bh = side;
       cropBoxRect = { x: (w - bw) / 2, y: (h - bh) / 2, w: bw, h: bh };
       updateCropBoxUI();
       $('#cropModal').classList.add('open');
@@ -1804,34 +1784,6 @@ $('#footerRefreshBtn').addEventListener('click', async () => {
   } finally {
     btn.classList.remove('spinning');
   }
-});
-
-function renderNicknameInputs(){
-  const wrap = $('#nicknameInputs');
-  if(!wrap) return;
-  wrap.innerHTML = Object.keys(KNOWN_PEOPLE).map(email => `
-    <div style="margin-top:10px;">
-      <label class="field-label">${escapeHtml(KNOWN_PEOPLE[email])}'s nickname</label>
-      <input type="text" class="nickname-input" data-email="${email}"
-        placeholder="${escapeHtml(KNOWN_PEOPLE[email])}"
-        value="${escapeHtml((data.nicknames && data.nicknames[email]) || '')}">
-    </div>
-  `).join('');
-}
-
-$('#saveNicknamesBtn').addEventListener('click', () => {
-  data.nicknames ||= {};
-  $all('.nickname-input').forEach(input => {
-    const email = input.dataset.email;
-    const val = input.value.trim();
-    if(val) data.nicknames[email] = val;
-    else delete data.nicknames[email];
-  });
-  if(me && me.email) me.name = displayNameFor(me.email);
-  updateWhoBadge();
-  renderAll();
-  persist();
-  alert("Nicknames saved — updated everywhere for both of you.");
 });
 
 /* ---------------- Render all + helpers ---------------- */
