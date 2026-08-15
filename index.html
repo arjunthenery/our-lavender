@@ -664,6 +664,10 @@
     --book-w: min(98vw, 900px);
     --book-h: min(94dvh, 980px);
   }
+  /* Inside the app (not the cover), fill the available height exactly —
+     no centering gap left over for the background to peek through. */
+  body.simple-layout #app .book{ height:100%; max-height:none; }
+  body.simple-layout #app .panel-stage{ height:100%; }
   @media (max-width:560px){
     body.simple-layout,
     body.simple-layout #gate,
