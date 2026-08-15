@@ -439,80 +439,6 @@
   .post .cap{ font-family:'Caveat',cursive; font-size:1.25rem; color:var(--ink); line-height:1.3; }
   .post .meta{ font-size:0.72rem; color:var(--plum-2); margin-top:8px; display:flex; justify-content:space-between; }
 
-  /* Chat */
-  .chat-card{
-    display:flex; flex-direction:column; padding:16px; height:100%;
-    background:linear-gradient(180deg, #fff, var(--paper-2) 220%);
-  }
-  .chat-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px; flex-shrink:0; }
-  .chat-window{
-    flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:2px;
-    padding:6px 6px 10px; scroll-behavior:smooth;
-  }
-  .chat-empty{ margin:auto; text-align:center; color:var(--plum-2); font-size:0.9rem; }
-  .chat-clear-banner{
-    background:var(--paper-2); border-radius:10px; padding:10px 14px;
-    font-size:0.82rem; color:var(--ink); margin-bottom:10px; flex-shrink:0;
-    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-  }
-  .chat-clear-banner .actions-inline{ display:flex; gap:8px; }
-  .chat-clear-banner button{
-    border:none; border-radius:999px; padding:6px 14px; font-size:0.76rem; font-weight:700; cursor:pointer;
-  }
-  .chat-clear-banner .yes-btn{ background:var(--rose); color:#fff; }
-  .chat-clear-banner .no-btn{ background:transparent; color:var(--plum-2); border:1.5px solid var(--line) !important; }
-  .chat-daydivider{
-    text-align:center; font-size:0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
-    color:var(--plum-2); margin:14px 0 8px; position:relative;
-  }
-  .chat-daydivider span{ background:transparent; padding:0 10px; position:relative; z-index:1; }
-  .chat-daydivider::before{
-    content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line);
-  }
-  .chat-daydivider span{ background:var(--paper-2); }
-  .chat-row{ display:flex; align-items:flex-end; margin-top:2px; }
-  .chat-row.mine{ justify-content:flex-end; }
-  .chat-row.theirs{ justify-content:flex-start; }
-  .chat-row.grouped{ margin-top:2px; }
-  .chat-row.new-group{ margin-top:10px; }
-  .bubble-col{ display:flex; flex-direction:column; max-width:78%; }
-  .chat-row.mine .bubble-col{ align-items:flex-end; }
-  .chat-row.theirs .bubble-col{ align-items:flex-start; }
-  .bubble{
-    padding:9px 14px; border-radius:18px; font-size:0.92rem; line-height:1.42;
-    box-shadow:0 1px 3px rgba(125,92,151,0.10);
-    position:relative;
-    animation:bubbleIn .18s ease;
-    word-break:break-word;
-  }
-  @keyframes bubbleIn{ from{ opacity:0; transform:translateY(4px) scale(0.98); } to{ opacity:1; transform:none; } }
-  .bubble.mine{ background:linear-gradient(135deg, var(--rose), #E0A9C6); color:#fff; border-bottom-right-radius:5px; }
-  .bubble.theirs{ background:var(--paper-2); color:var(--ink); border-bottom-left-radius:5px; }
-  .chat-row.grouped .bubble.mine{ border-top-right-radius:5px; }
-  .chat-row.grouped .bubble.theirs{ border-top-left-radius:5px; }
-  .bubble .ts{
-    font-size:0.58rem; opacity:0; max-height:0; overflow:hidden;
-    transition:opacity .15s ease, max-height .15s ease;
-    color:var(--plum-2); margin:2px 10px 0;
-  }
-  .chat-row.mine .bubble .ts{ text-align:right; }
-  .bubble-col:hover .ts, .bubble-col.show-ts .ts{ opacity:0.85; max-height:20px; }
-  .chat-inputbar{ display:flex; gap:8px; margin-top:12px; flex-shrink:0; align-items:center; }
-  .chat-inputbar input{
-    flex:1; border-radius:999px; padding:11px 18px; background:#fff;
-    border:1.5px solid var(--line);
-  }
-  .chat-inputbar input:focus{ outline:none; border-color:var(--rose); }
-  .chat-send{
-    width:38px; height:38px; border-radius:50%; border:none; cursor:pointer;
-    background:var(--rose); color:#fff; display:flex; align-items:center; justify-content:center;
-    flex-shrink:0; box-shadow:0 3px 10px rgba(230,174,203,0.5);
-    transition:transform .12s ease;
-  }
-  .chat-send:hover{ transform:scale(1.06); }
-  .chat-send:active{ transform:scale(0.94); }
-  .chat-send svg{ width:16px; height:16px; }
-
 
   /* Plans */
   #plansList{ display:flex; flex-direction:column; gap:10px; margin-top:14px;}
@@ -741,7 +667,6 @@
   <div class="book">
   <nav class="tabs">
     <button data-tab="feed" class="active">Feed</button>
-    <button data-tab="chat">Chat</button>
     <button data-tab="plans">Plans</button>
     <button data-tab="countdown">Countdown</button>
     <button data-tab="settings">Settings</button>
@@ -783,31 +708,6 @@
         </button>
         <button class="btn ghost small" id="signOutBtn">Close Book</button>
       </div>
-    </div>
-  </section>
-
-  <!-- CHAT -->
-  <section class="panel" id="panel-chat">
-    <div class="panel-content">
-    <div class="card chat-card">
-      <div class="chat-head">
-        <h2 class="section-title" style="margin:0;">Chat</h2>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <span id="chatLiveHint" style="font-size:0.72rem;color:var(--plum-2);">checking every few seconds</span>
-          <button class="btn ghost small" id="requestClearChatBtn">Clear chat</button>
-        </div>
-      </div>
-      <div id="chatClearBanner" class="chat-clear-banner" style="display:none;"></div>
-      <div id="chatList" class="chat-window"></div>
-      <div class="chat-inputbar">
-        <input type="text" id="chatInput" placeholder="Type a message...">
-        <button class="chat-send" id="chatSendBtn" aria-label="Send">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3.4 20.4L21 12 3.4 3.6 3 10l13 2-13 2 .4 6.4z" fill="currentColor"/>
-          </svg>
-        </button>
-      </div>
-    </div>
     </div>
   </section>
 
@@ -895,7 +795,7 @@
     <div class="card settings-grid" id="nicknameCard" style="display:none;">
       <h2 class="section-title">Nicknames</h2>
       <p style="font-size:0.8rem;color:var(--plum-2); margin:0;">
-        Shared between you both — set a nickname and it shows up in Feed and Chat for the other person too.
+        Shared between you both — set a nickname and it shows up in Feed for the other person too.
       </p>
       <div id="nicknameInputs"></div>
       <div class="actions" style="justify-content:flex-end;">
@@ -1069,7 +969,7 @@ const MOCK_ME_KEY = 'ourlavender-mock-me';
 
 function afterSignInMock(){
   // In test mode there's no real Google account, so ask which of you this is
-  // just so posts/chat can tell you apart while you build things out.
+  // just so posts can tell you apart while you build things out.
   let stored = null;
   try{ stored = JSON.parse(localStorage.getItem(MOCK_ME_KEY)); }catch(e){}
   const name = stored?.name || prompt("Test mode — what's your name? (just for telling posts apart)", "You") || "You";
@@ -1080,8 +980,8 @@ function afterSignInMock(){
     const raw = localStorage.getItem(MOCK_STORAGE_KEY);
     data = raw ? JSON.parse(raw) : blankData();
   }catch(e){ data = blankData(); }
-  data.posts ||= []; data.plans ||= []; data.chat ||= [];
-  data.countdowns ||= []; data.nicknames ||= {}; data.chatClearRequest = data.chatClearRequest || null;
+  data.posts ||= []; data.plans ||= [];
+  data.countdowns ||= []; data.nicknames ||= {};
   if(data.countdown && data.countdown.date){
     data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
     delete data.countdown;
@@ -1110,8 +1010,8 @@ async function driveFindFile(){
 function blankData(){
   return {
     spaceName: "Our Lavender",
-    posts: [], plans: [], chat: [], countdowns: [],
-    nicknames: {}, chatClearRequest: null
+    posts: [], plans: [], countdowns: [],
+    nicknames: {}
   };
 }
 
@@ -1163,8 +1063,8 @@ async function loadData(){
     try{ data = await driveGetContent(fileId); }
     catch(e){ data = blankData(); }
     if(!data || typeof data !== 'object'){ data = blankData(); }
-    data.posts ||= []; data.plans ||= []; data.chat ||= [];
-    data.countdowns ||= []; data.nicknames ||= {}; data.chatClearRequest = data.chatClearRequest || null;
+    data.posts ||= []; data.plans ||= [];
+    data.countdowns ||= []; data.nicknames ||= {};
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1209,13 +1109,10 @@ async function persist(){
 }
 
 // Saves immediately (no debounce) and waits for it to actually finish.
-// Used for one-off confirmed actions (like clearing chat) where a background
-// poll could otherwise race the save and overwrite the change before it lands.
-let suppressNextChatPoll = false;
+// Used for one-off confirmed actions where waiting on the normal debounce isn't ideal.
 async function persistNow(){
   clearTimeout(saveTimer);
   setSync('busy', 'Saving...');
-  suppressNextChatPoll = true;
   if(CONFIG.MOCK_MODE){
     try{
       localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(data));
@@ -1243,8 +1140,8 @@ async function refreshFromDrive(){
   setSync('busy', 'Refreshing...');
   try{
     data = await driveGetContent(fileId);
-    data.posts ||= []; data.plans ||= []; data.chat ||= [];
-    data.countdowns ||= []; data.nicknames ||= {}; data.chatClearRequest = data.chatClearRequest || null;
+    data.posts ||= []; data.plans ||= [];
+    data.countdowns ||= []; data.nicknames ||= {};
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1292,9 +1189,6 @@ function switchToTab(tabName){
     };
     newPanel.addEventListener('animationend', cleanupNew);
   }
-
-  if(tabName === 'chat'){ startChatPolling(); renderChat(); }
-  else { stopChatPolling(); }
 
   updateActiveDot(tabName);
 }
@@ -1709,167 +1603,6 @@ function cancelPostEdit(){
 }
 $('#cancelPostEditBtn').addEventListener('click', cancelPostEdit);
 
-/* ---------------- Chat ---------------- */
-function sendChat(){
-  const input = $('#chatInput');
-  const text = input.value.trim();
-  if(!text) return;
-  data.chat.push({ id: uid(), text, author: me.name, authorEmail: me.email, ts: Date.now() });
-  data.chat = data.chat.slice(-300); // keep the file from growing forever
-  input.value = '';
-  renderChat();
-  persist();
-}
-$('#chatSendBtn').addEventListener('click', sendChat);
-$('#chatInput').addEventListener('keydown', (e) => {
-  if(e.key === 'Enter'){ e.preventDefault(); sendChat(); }
-});
-
-function isSameDay(a, b){
-  const d1 = new Date(a), d2 = new Date(b);
-  return d1.toDateString() === d2.toDateString();
-}
-function dayLabel(ts){
-  const d = new Date(ts), today = new Date();
-  const yesterday = new Date(); yesterday.setDate(today.getDate()-1);
-  if(d.toDateString() === today.toDateString()) return 'Today';
-  if(d.toDateString() === yesterday.toDateString()) return 'Yesterday';
-  return d.toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
-}
-
-function renderChat(){
-  renderChatClearBanner();
-  const list = $('#chatList');
-  if(!list) return;
-  const wasNearBottom = (list.scrollHeight - list.scrollTop - list.clientHeight) < 60;
-  list.innerHTML = '';
-  if(!data.chat.length){
-    list.innerHTML = '<div class="chat-empty">Say hi 👋</div>';
-    return;
-  }
-  data.chat.forEach((m, i) => {
-    const prev = data.chat[i-1];
-    const sameEmail = (a, b) => (a||'').trim().toLowerCase() === (b||'').trim().toLowerCase();
-    const mine = sameEmail(m.authorEmail, me.email);
-    if(!prev || !isSameDay(prev.ts, m.ts)){
-      const div = document.createElement('div');
-      div.className = 'chat-daydivider';
-      div.innerHTML = `<span>${dayLabel(m.ts)}</span>`;
-      list.appendChild(div);
-    }
-    const grouped = prev && sameEmail(prev.authorEmail, m.authorEmail) && isSameDay(prev.ts, m.ts) && (m.ts - prev.ts) < 5 * 60000;
-
-    const row = document.createElement('div');
-    row.className = 'chat-row ' + (mine ? 'mine' : 'theirs') + ' ' + (grouped ? 'grouped' : 'new-group');
-
-    const col = document.createElement('div');
-    col.className = 'bubble-col';
-    col.innerHTML = `
-      <div class="bubble ${mine ? 'mine' : 'theirs'}">${escapeHtml(m.text)}</div>
-      <span class="ts">${fmtTime(m.ts)}</span>
-    `;
-    col.addEventListener('click', () => col.classList.toggle('show-ts'));
-
-    row.appendChild(col);
-    row.appendChild(col);
-    list.appendChild(row);
-  });
-  if(wasNearBottom || list.dataset.first !== 'done'){
-    list.scrollTop = list.scrollHeight;
-    list.dataset.first = 'done';
-  }
-}
-
-function renderChatClearBanner(){
-  const banner = $('#chatClearBanner');
-  if(!banner) return;
-  const req = data && data.chatClearRequest;
-  if(!req){
-    banner.style.display = 'none';
-    banner.innerHTML = '';
-    return;
-  }
-  banner.style.display = 'flex';
-  if(me && (req.by||'').trim().toLowerCase() === (me.email||'').trim().toLowerCase()){
-    banner.innerHTML = `
-      <span>Waiting for ${escapeHtml(otherPersonLabel())} to agree to clear the chat...</span>
-      <div class="actions-inline"><button class="no-btn" id="cancelClearReqBtn">Cancel request</button></div>
-    `;
-    $('#cancelClearReqBtn').addEventListener('click', async () => {
-      data.chatClearRequest = null;
-      renderChatClearBanner();
-      await persistNow();
-    });
-  } else {
-    const reqName = displayNameFor(req.by);
-    banner.innerHTML = `
-      <span>${escapeHtml(reqName)} wants to clear the chat. Agree?</span>
-      <div class="actions-inline">
-        <button class="no-btn" id="declineClearBtn">No</button>
-        <button class="yes-btn" id="approveClearBtn">Yes, clear it</button>
-      </div>
-    `;
-    $('#declineClearBtn').addEventListener('click', async () => {
-      data.chatClearRequest = null;
-      renderChatClearBanner();
-      await persistNow();
-    });
-    $('#approveClearBtn').addEventListener('click', async () => {
-      const btn = $('#approveClearBtn');
-      btn.disabled = true;
-      btn.textContent = 'Clearing...';
-      data.chat = [];
-      data.chatClearRequest = null;
-      renderChat();
-      await persistNow();
-    });
-  }
-}
-
-function otherPersonLabel(){
-  const otherEmail = Object.keys(KNOWN_PEOPLE).find(e => e !== (me && me.email));
-  return otherEmail ? displayNameFor(otherEmail) : 'the other person';
-}
-
-$('#requestClearChatBtn').addEventListener('click', async () => {
-  if(!me) return;
-  if(data.chatClearRequest){
-    alert("There's already a pending clear-chat request.");
-    return;
-  }
-  if(!confirm("Ask to clear the whole chat? It'll only actually clear once the other person agrees.")) return;
-  data.chatClearRequest = { by: me.email, ts: Date.now() };
-  renderChatClearBanner();
-  await persistNow();
-});
-
-
-let chatPollTimer = null;
-function startChatPolling(){
-  stopChatPolling();
-  chatPollTimer = setInterval(async () => {
-    if(suppressNextChatPoll){ suppressNextChatPoll = false; return; }
-    if(CONFIG.MOCK_MODE){
-      try{
-        const raw = localStorage.getItem(MOCK_STORAGE_KEY);
-        if(raw){
-          const fresh = JSON.parse(raw);
-          data.chat = fresh.chat || data.chat;
-          data.chatClearRequest = fresh.chatClearRequest || null;
-          renderChat();
-        }
-      }catch(e){}
-    } else if(fileId && accessToken){
-      try{
-        const fresh = await driveGetContent(fileId);
-        data.chat = fresh.chat || data.chat;
-        data.chatClearRequest = fresh.chatClearRequest || null;
-        renderChat();
-      }catch(e){}
-    }
-  }, 5000);
-}
-function stopChatPolling(){ if(chatPollTimer){ clearInterval(chatPollTimer); chatPollTimer = null; } }
 
 /* ---------------- Plans ---------------- */
 let editingPlanId = null;
@@ -2081,7 +1814,7 @@ function renderAll(){
   $('#spaceName').value = data.spaceName || 'Our Lavender';
   $('#brandTitle').textContent = data.spaceName || 'Our Lavender';
   document.title = data.spaceName || 'Our Lavender';
-  renderFeed(); renderChat(); renderPlans(); renderCountdown();
+  renderFeed(); renderPlans(); renderCountdown();
 }
 
 function fmtDate(ts){
