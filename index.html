@@ -130,6 +130,20 @@
     box-shadow:0 6px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
   }
   .book-cover #configNotice{ color:#F3D9E6; }
+  #pinUnlock{
+    display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap;
+  }
+  #pinUnlock input{
+    width:130px; text-align:center; letter-spacing:0.3em; font-size:1rem;
+    border-radius:999px; border:1.5px solid rgba(255,255,255,0.35);
+    background:rgba(255,255,255,0.12); color:#fff; padding:10px 16px;
+  }
+  #pinUnlock input::placeholder{ color:rgba(255,255,255,0.65); letter-spacing:normal; font-size:0.85rem; }
+  .book-cover .btn.ghost{
+    background:transparent; color:#F3D9E6; box-shadow:none;
+    border:1.5px solid rgba(255,240,248,0.3);
+  }
+  .book-cover .btn.ghost:hover{ color:#fff; }
   .btn{
     font-family:'Nunito Sans',sans-serif;
     font-weight:700;
@@ -193,46 +207,51 @@
 
   /* washi tape tabs */
   nav.tabs{
-    display:flex; flex-wrap:wrap; align-items:flex-end; gap:4px;
-    margin-bottom:0; padding-left:14px; position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:stretch; gap:8px;
+    padding-top:22px; position:relative; z-index:2;
     flex-shrink:0;
+    order:2;
+    width:64px;
   }
   nav.tabs button{
     font-family:'Nunito Sans',sans-serif;
-    font-weight:700; font-size:0.74rem; letter-spacing:0.03em; text-transform:uppercase;
+    font-weight:700; font-size:0.62rem; letter-spacing:0.02em; text-transform:uppercase;
     border:none; cursor:pointer;
-    padding:10px 16px 12px;
+    padding:12px 4px;
     background:var(--paper-2);
     color:var(--plum-2);
-    border-radius:10px 10px 0 0;
+    border-radius:0 10px 10px 0;
     position:relative;
-    box-shadow:0 -2px 4px rgba(74,49,120,0.06);
+    box-shadow:2px 2px 5px rgba(74,49,120,0.08);
     transition:background .15s ease, color .15s ease, transform .15s ease;
-    transform:translateY(3px);
+    transform:translateX(-4px);
+    line-height:1.15;
+    word-break:break-word;
   }
-  nav.tabs button:hover{ transform:translateY(0); color:var(--plum); }
+  nav.tabs button:hover{ transform:translateX(0); color:var(--plum); }
   nav.tabs button.active{
     background:var(--paper);
     color:var(--plum);
-    transform:translateY(0);
-    box-shadow:0 -3px 8px rgba(74,49,120,0.08);
+    transform:translateX(0);
+    box-shadow:3px 2px 8px rgba(74,49,120,0.10);
     z-index:3;
   }
   nav.tabs button.active::after{
     content:"";
-    position:absolute; left:10px; right:10px; bottom:6px; height:3px;
+    position:absolute; left:4px; top:8px; bottom:8px; width:3px;
     background:var(--rose); opacity:0.8; border-radius:2px;
   }
 
   .book{
     position:relative; padding-left:16px; padding-bottom:14px;
-    width:calc(var(--book-w) + 16px);
+    width:calc(var(--book-w) + 16px + 74px);
     max-width:100%;
     margin:0 auto;
     flex:1;
     min-height:0;
     display:flex;
-    flex-direction:column;
+    flex-direction:row;
+    align-items:stretch;
   }
   .panel-stage{
     display:grid;
@@ -246,6 +265,7 @@
     max-width:100%;
     flex:1;
     min-height:0;
+    order:1;
     box-shadow:
       7px 7px 0 -3px var(--paper-2),
       13px 12px 0 -6px var(--rose-soft),
@@ -347,6 +367,12 @@
     position:absolute; top:-10px; left:50%; transform:translateX(-50%) rotate(-3deg);
     width:70px; height:22px; background:rgba(230,174,203,0.5);
     box-shadow:0 2px 4px rgba(0,0,0,0.08);
+  }
+  .post .post-del{
+    position:absolute; top:8px; right:8px; z-index:2;
+    width:24px; height:24px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,0.85); color:var(--rose); font-size:0.8rem;
+    box-shadow:0 2px 6px rgba(0,0,0,0.15);
   }
   .post img{ width:100%; display:block; border-radius:1px; margin-bottom:10px; background:var(--paper-2); }
   .post .cap{ font-family:'Caveat',cursive; font-size:1.25rem; color:var(--ink); line-height:1.3; }
@@ -480,7 +506,7 @@
     font-size:0.72rem; color:var(--plum-2);
   }
 
-  @media (max-width:520px){
+  @media (max-width:560px){
     :root{ --book-w: 94vw; --book-h: min(74vh, 660px); }
     .note{ max-width:92%; }
     .plan{ flex-wrap:wrap; }
@@ -488,9 +514,24 @@
     .book-cover h1{ font-size:1.7rem; }
     .gate-sprig{ width:24px; max-height:80px; }
     .book-cover p{ font-size:0.86rem; margin-bottom:20px; }
-    .panel-stage{ padding:14px 14px 4px; }
-    nav.tabs{ padding-left:8px; gap:3px; }
-    nav.tabs button{ padding:8px 11px 10px; font-size:0.66rem; }
+    .panel-stage{ padding:14px 14px 4px; order:2; }
+    .book{
+      flex-direction:column;
+      width:calc(var(--book-w) + 16px);
+    }
+    nav.tabs{
+      flex-direction:row; flex-wrap:wrap; align-items:flex-end;
+      width:auto; order:1; padding-top:0; padding-left:14px; gap:3px;
+    }
+    nav.tabs button{
+      border-radius:10px 10px 0 0;
+      padding:8px 11px 10px; font-size:0.66rem;
+      transform:translateY(3px);
+    }
+    nav.tabs button:hover, nav.tabs button.active{ transform:translateY(0); }
+    nav.tabs button.active::after{
+      left:10px; right:10px; top:auto; bottom:6px; width:auto; height:3px;
+    }
     .book-footer{ margin-top:8px; }
     .brand h1{ font-size:1.2rem; }
     .card{ padding:16px; }
@@ -539,8 +580,15 @@
         <h1>Our Lavender</h1>
         <svg class="gate-sprig flip" viewBox="0 0 70 210"><use href="#lavSprig"></use></svg>
       </div>
-      <p>A little corner of the internet just for the two of you. Sign in with the Google account that has access to your shared folder.</p>
+      <p id="gateTagline">A little corner of the internet just for the two of you. Sign in with the Google account that has access to your shared folder.</p>
       <button class="btn" id="signInBtn">Sign in with Google</button>
+
+      <div id="pinUnlock" style="display:none;">
+        <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="pinInput" placeholder="Enter your PIN">
+        <button class="btn" id="pinUnlockBtn">Unlock</button>
+      </div>
+      <button class="btn ghost small" id="pinToggleBtn" style="display:none; margin-top:10px;"></button>
+
       <div id="configNotice"></div>
     </div>
   </div>
@@ -674,6 +722,36 @@
         Nobody else can read it unless you share the folder further.
       </p>
     </div>
+
+    <div class="card settings-grid" id="displayNameCard" style="display:none;">
+      <h2 class="section-title">Your name</h2>
+      <div>
+        <label class="field-label">How you're shown in posts and chat</label>
+        <input type="text" id="displayNameInput" placeholder="Your name">
+      </div>
+      <div class="actions" style="justify-content:flex-end;">
+        <button class="btn small" id="saveDisplayNameBtn">Save</button>
+      </div>
+    </div>
+
+    <div class="card settings-grid" id="pinCard" style="display:none;">
+      <h2 class="section-title">Quick unlock PIN</h2>
+      <p style="font-size:0.8rem;color:var(--plum-2); margin:0;">
+        Set a PIN so this device can jump back in without picking your Google account every time.
+        This only skips the click-through — Google may still occasionally ask you to confirm if your session has expired.
+        The PIN is stored only on this device, never synced.
+      </p>
+      <div class="row">
+        <div>
+          <label class="field-label">Set / change PIN</label>
+          <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" id="newPinInput" placeholder="4-6 digits">
+        </div>
+      </div>
+      <div class="actions" style="justify-content:flex-end; gap:8px;">
+        <button class="btn small ghost" id="removePinBtn">Remove PIN</button>
+        <button class="btn small" id="savePinBtn">Save PIN</button>
+      </div>
+    </div>
     </div>
   </section>
   </div>
@@ -719,6 +797,31 @@ function uid(){
   return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
 }
 
+/* ---------------- Local device preferences (name + quick-unlock PIN) ----------------
+   These live only in this browser's localStorage — never synced to Drive or seen
+   by the other person. They just reduce friction on this specific device. */
+function getSavedName(email){
+  try{ return localStorage.getItem('ourlavender-name-' + email) || ''; }catch(e){ return ''; }
+}
+function setSavedName(email, name){
+  try{ localStorage.setItem('ourlavender-name-' + email, name); }catch(e){}
+}
+function getSavedPin(email){
+  try{ return localStorage.getItem('ourlavender-pin-' + email) || ''; }catch(e){ return ''; }
+}
+function setSavedPin(email, pin){
+  try{
+    if(pin){ localStorage.setItem('ourlavender-pin-' + email, pin); }
+    else{ localStorage.removeItem('ourlavender-pin-' + email); }
+  }catch(e){}
+}
+function getLastEmail(){
+  try{ return localStorage.getItem('ourlavender-last-email') || ''; }catch(e){ return ''; }
+}
+function setLastEmail(email){
+  try{ localStorage.setItem('ourlavender-last-email', email); }catch(e){}
+}
+
 function configLooksReady(){
   return CONFIG.CLIENT_ID && !CONFIG.CLIENT_ID.startsWith("PASTE_")
       && CONFIG.FOLDER_ID && !CONFIG.FOLDER_ID.startsWith("PASTE_");
@@ -729,9 +832,51 @@ window.addEventListener('load', () => {
     $('#configNotice').textContent = "Test mode: sign-in is bypassed for now and data is saved to this browser only. Flip CONFIG.MOCK_MODE to false once your Google Client ID and Folder ID are filled in.";
   } else if(!configLooksReady()){
     $('#configNotice').textContent = "Heads up: this file still needs your Client ID and Folder ID filled in at the top of the <script> section before sign-in will work.";
+  } else {
+    setupPinGateIfAvailable();
   }
   initGoogle();
 });
+
+function setupPinGateIfAvailable(){
+  const email = getLastEmail();
+  const pin = email ? getSavedPin(email) : '';
+  if(!email || !pin) return;
+  const name = getSavedName(email);
+  $('#gateTagline').textContent = `Welcome back${name ? ', ' + name : ''}. Enter your PIN to jump back in on this device.`;
+  $('#signInBtn').style.display = 'none';
+  $('#pinUnlock').style.display = 'flex';
+  $('#pinToggleBtn').style.display = 'inline-block';
+  $('#pinToggleBtn').textContent = 'Use Google sign-in instead';
+  $('#pinInput').focus();
+}
+
+$('#pinToggleBtn').addEventListener('click', () => {
+  $('#signInBtn').style.display = 'inline-block';
+  $('#pinUnlock').style.display = 'none';
+  $('#pinToggleBtn').style.display = 'none';
+  $('#gateTagline').textContent = "A little corner of the internet just for the two of you. Sign in with the Google account that has access to your shared folder.";
+});
+
+async function tryPinUnlock(){
+  const email = getLastEmail();
+  const enteredPin = $('#pinInput').value.trim();
+  const savedPin = getSavedPin(email);
+  if(!enteredPin || enteredPin !== savedPin){
+    alert("That PIN doesn't match. Try again, or use Google sign-in instead.");
+    return;
+  }
+  if(!tokenClient){ alert("Still loading Google sign-in, try again in a second."); return; }
+  setSync('busy', 'Unlocking...');
+  // Ask Google for a fresh token without the full account-picker/consent screen when possible.
+  // If the browser session has expired, Google will fall back to showing the picker anyway.
+  pendingPinUnlockEmail = email;
+  tokenClient.requestAccessToken({ prompt: '', hint: email });
+}
+let pendingPinUnlockEmail = null;
+
+$('#pinUnlockBtn').addEventListener('click', tryPinUnlock);
+$('#pinInput').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); tryPinUnlock(); } });
 
 function initGoogle(){
   if(CONFIG.MOCK_MODE) return;
@@ -741,7 +886,17 @@ function initGoogle(){
       client_id: CONFIG.CLIENT_ID,
       scope: CONFIG.SCOPE,
       callback: async (resp) => {
-        if(resp.error){ alert("Sign-in failed: " + resp.error); return; }
+        if(resp.error){
+          if(pendingPinUnlockEmail){
+            pendingPinUnlockEmail = null;
+            setSync('err', '');
+            alert("Couldn't unlock silently — your Google session needs a fresh sign-in. Use \"Use Google sign-in instead\" below.");
+            return;
+          }
+          alert("Sign-in failed: " + resp.error);
+          return;
+        }
+        pendingPinUnlockEmail = null;
         accessToken = resp.access_token;
         await afterSignIn();
       }
@@ -777,6 +932,20 @@ async function afterSignIn(){
   });
   me = await uRes.json();
   $('#meAvatar').src = me.picture || '';
+
+  // First time this Google account signs in on this device: ask what to call them.
+  let savedName = getSavedName(me.email);
+  if(!savedName){
+    savedName = (prompt("What would you like to be called in the app?", me.name || '') || me.name || '').trim();
+    if(savedName) setSavedName(me.email, savedName);
+  }
+  if(savedName) me.name = savedName;
+  setLastEmail(me.email);
+
+  $('#displayNameCard').style.display = 'flex';
+  $('#displayNameInput').value = me.name || '';
+  $('#pinCard').style.display = 'flex';
+  $('#newPinInput').value = '';
 
   await loadData();
   $('#gate').style.display = 'none';
@@ -1039,10 +1208,15 @@ function renderFeed(){
     el.className = 'post';
     el.innerHTML = `
       <div class="tape"></div>
+      <button class="post-del" data-id="${p.id}" aria-label="Remove">✕</button>
       ${p.img ? `<img src="${p.img}" alt="">` : ''}
       ${p.caption ? `<div class="cap">${escapeHtml(p.caption)}</div>` : ''}
       <div class="meta"><span>${escapeHtml(p.author||'')}</span><span>${fmtDate(p.ts)}</span></div>
     `;
+    el.querySelector('.post-del').addEventListener('click', () => {
+      data.posts = data.posts.filter(x => x.id !== p.id);
+      renderFeed(); persist();
+    });
     list.appendChild(el);
   });
 }
@@ -1242,6 +1416,30 @@ $('#saveSettingsBtn').addEventListener('click', () => {
   persist();
 });
 $('#refreshBtn').addEventListener('click', () => { refreshFromDrive().then(renderAll); });
+
+$('#saveDisplayNameBtn').addEventListener('click', () => {
+  if(!me || !me.email) return;
+  const name = $('#displayNameInput').value.trim();
+  if(!name){ alert("Enter a name first."); return; }
+  setSavedName(me.email, name);
+  me.name = name;
+  alert("Saved. New posts and messages will show this name.");
+});
+
+$('#savePinBtn').addEventListener('click', () => {
+  if(!me || !me.email) return;
+  const pin = $('#newPinInput').value.trim();
+  if(!/^\d{4,6}$/.test(pin)){ alert("PIN needs to be 4–6 digits."); return; }
+  setSavedPin(me.email, pin);
+  alert("PIN saved. Next time you open this on this device, you can unlock with it instead of the full Google sign-in.");
+});
+
+$('#removePinBtn').addEventListener('click', () => {
+  if(!me || !me.email) return;
+  setSavedPin(me.email, '');
+  $('#newPinInput').value = '';
+  alert("PIN removed from this device.");
+});
 
 /* ---------------- Render all + helpers ---------------- */
 function renderAll(){
