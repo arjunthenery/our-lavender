@@ -303,7 +303,6 @@
   .panel-stage{
     display:grid;
     grid-template-rows:auto 1fr;
-    perspective:1800px;
     position:relative;
     background:var(--paper);
     border-radius:0 14px 14px 14px;
@@ -313,6 +312,7 @@
     max-width:100%;
     flex:1;
     order:1;
+    overflow:hidden;
     box-shadow:
       7px 7px 0 -3px var(--paper-2),
       13px 12px 0 -6px var(--rose-soft),
@@ -339,34 +339,35 @@
   section.panel{
     display:none;
     grid-row:2; grid-column:1;
-    transform-origin:left center;
-    backface-visibility:hidden;
     min-width:0;
     height:100%;
     flex-direction:column;
     overflow:hidden;
   }
   section.panel.active{ display:flex; }
-  section.panel.turn-out{
-    display:flex;
-    animation:pageTurnOut .5s cubic-bezier(.4,.1,.3,1) forwards;
-    box-shadow:8px 0 24px rgba(74,49,120,0.12);
+  section.panel.slide-out-left{ display:flex; animation:slideOutLeft .32s ease forwards; }
+  section.panel.slide-out-right{ display:flex; animation:slideOutRight .32s ease forwards; }
+  section.panel.slide-in-from-right{ display:flex; animation:slideInFromRight .32s ease forwards; }
+  section.panel.slide-in-from-left{ display:flex; animation:slideInFromLeft .32s ease forwards; }
+  @keyframes slideOutLeft{
+    from{ transform:translateX(0); opacity:1; }
+    to{ transform:translateX(-100%); opacity:0; }
   }
-  section.panel.turn-in{
-    display:flex;
-    animation:pageTurnIn .5s cubic-bezier(.3,.1,.2,1) forwards;
+  @keyframes slideOutRight{
+    from{ transform:translateX(0); opacity:1; }
+    to{ transform:translateX(100%); opacity:0; }
   }
-  @keyframes pageTurnOut{
-    0%{ transform:rotateY(0deg); opacity:1; }
-    100%{ transform:rotateY(-98deg); opacity:0.3; }
+  @keyframes slideInFromRight{
+    from{ transform:translateX(100%); opacity:0; }
+    to{ transform:translateX(0); opacity:1; }
   }
-  @keyframes pageTurnIn{
-    0%{ transform:rotateY(92deg); opacity:0.3; }
-    55%{ opacity:1; }
-    100%{ transform:rotateY(0deg); opacity:1; }
+  @keyframes slideInFromLeft{
+    from{ transform:translateX(-100%); opacity:0; }
+    to{ transform:translateX(0); opacity:1; }
   }
   @media (prefers-reduced-motion: reduce){
-    section.panel.turn-out, section.panel.turn-in{ animation:none !important; }
+    section.panel.slide-out-left, section.panel.slide-out-right,
+    section.panel.slide-in-from-right, section.panel.slide-in-from-left{ animation:none !important; }
   }
 
   .card{
@@ -1255,15 +1256,24 @@ function switchToTab(tabName){
     if(oldPanel) oldPanel.classList.remove('active');
     newPanel.classList.add('active');
   } else {
-    oldPanel.classList.remove('active');
-    oldPanel.classList.add('turn-out');
-    newPanel.classList.add('turn-in');
+    const buttons = $all('nav.tabs button');
+    const oldTab = oldPanel.id.replace('panel-', '');
+    const oldIndex = buttons.findIndex(b => b.dataset.tab === oldTab);
+    const newIndex = buttons.findIndex(b => b.dataset.tab === tabName);
+    const forward = newIndex > oldIndex;
 
-    const cleanupOld = () => { oldPanel.classList.remove('turn-out'); oldPanel.removeEventListener('animationend', cleanupOld); };
+    oldPanel.classList.remove('active');
+    oldPanel.classList.add(forward ? 'slide-out-left' : 'slide-out-right');
+    newPanel.classList.add(forward ? 'slide-in-from-right' : 'slide-in-from-left');
+
+    const cleanupOld = () => {
+      oldPanel.classList.remove('slide-out-left', 'slide-out-right');
+      oldPanel.removeEventListener('animationend', cleanupOld);
+    };
     oldPanel.addEventListener('animationend', cleanupOld);
 
     const cleanupNew = () => {
-      newPanel.classList.remove('turn-in');
+      newPanel.classList.remove('slide-in-from-right', 'slide-in-from-left');
       newPanel.classList.add('active');
       newPanel.removeEventListener('animationend', cleanupNew);
     };
