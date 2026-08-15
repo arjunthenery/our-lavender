@@ -424,7 +424,9 @@
   h2.section-title{
     font-family:'Cormorant Garamond',serif; font-weight:600; font-size:1.3rem;
     color:var(--plum); margin:0 0 14px;
+    display:flex; align-items:center; gap:8px;
   }
+  .heading-sprig{ width:18px; height:auto; max-height:54px; flex-shrink:0; }
   textarea, input[type=text], input[type=date], input[type=time]{
     font-family:'Nunito Sans',sans-serif;
     border:1.5px solid var(--line);
@@ -726,7 +728,7 @@
   <section class="panel active" id="panel-feed">
     <div class="panel-content">
     <div class="card composer">
-      <h2 class="section-title">Add a memory</h2>
+      <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Add a memory</h2>
       <input type="text" id="postCaption" placeholder="Write a little caption...">
       <div class="actions" style="margin-top:2px;">
         <label class="btn small ghost attach-photo-btn" for="postImage">Attach Photo</label>
@@ -745,7 +747,6 @@
     </div>
     <div class="book-footer" id="pageFooter">
       <div class="brand">
-        <svg width="16" height="48" viewBox="0 0 70 210" style="flex-shrink:0;"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>
         <h1 id="brandTitle">Our Lavender</h1>
         <span class="who-badge" id="whoBadge">?</span>
       </div>
@@ -764,7 +765,7 @@
   <section class="panel" id="panel-plans">
     <div class="panel-content">
     <div class="card">
-      <h2 class="section-title">Add a plan</h2>
+      <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Add a plan</h2>
       <div class="row">
         <div>
           <label class="field-label">Date</label>
@@ -792,7 +793,7 @@
   <section class="panel" id="panel-countdown">
     <div class="panel-content">
     <div class="card">
-      <h2 class="section-title">Add an occasion</h2>
+      <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Add an occasion</h2>
       <div class="row">
         <div>
           <label class="field-label">Occasion</label>
@@ -816,7 +817,7 @@
   <section class="panel" id="panel-settings">
     <div class="panel-content">
     <div class="card settings-grid">
-      <h2 class="section-title">Settings</h2>
+      <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Settings</h2>
       <div>
         <label class="field-label">Space name</label>
         <div style="display:flex; gap:8px;">
