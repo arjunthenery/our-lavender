@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Our Lavender</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7D5C97">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Our Lavender">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -423,24 +430,14 @@
     content:""; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line);
   }
   .chat-daydivider span{ background:var(--paper-2); }
-  .chat-row{ display:flex; align-items:flex-end; gap:8px; margin-top:2px; }
-  .chat-row.mine{ flex-direction:row-reverse; }
+  .chat-row{ display:flex; align-items:flex-end; margin-top:2px; }
+  .chat-row.mine{ justify-content:flex-end; }
+  .chat-row.theirs{ justify-content:flex-start; }
   .chat-row.grouped{ margin-top:2px; }
-  .chat-row.new-group{ margin-top:12px; }
-  .chat-avatar{
-    width:26px; height:26px; border-radius:50%; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-    font-size:0.65rem; font-weight:700; color:#fff;
-    font-family:'Nunito Sans',sans-serif;
-  }
-  .chat-avatar.mine{ background:var(--rose); }
-  .chat-avatar.theirs{ background:var(--plum-2); }
-  .chat-avatar.spacer{ visibility:hidden; }
-  .bubble-col{ display:flex; flex-direction:column; max-width:74%; }
+  .chat-row.new-group{ margin-top:10px; }
+  .bubble-col{ display:flex; flex-direction:column; max-width:78%; }
   .chat-row.mine .bubble-col{ align-items:flex-end; }
-  .bubble-who{
-    font-size:0.66rem; font-weight:700; color:var(--plum-2); margin:0 10px 3px;
-  }
+  .chat-row.theirs .bubble-col{ align-items:flex-start; }
   .bubble{
     padding:9px 14px; border-radius:18px; font-size:0.92rem; line-height:1.42;
     box-shadow:0 1px 3px rgba(125,92,151,0.10);
@@ -588,34 +585,18 @@
   .crop-handle[data-corner="se"]{ top:100%; left:100%; cursor:nwse-resize; }
 
   @media (max-width:560px){
-    :root{ --book-w: 94vw; --book-h: min(74vh, 660px); }
+    :root{ --book-w: 84vw; --book-h: min(74vh, 660px); }
     .note{ max-width:92%; }
     .plan{ flex-wrap:wrap; }
     .book-cover{ padding:20px 18px; }
     .book-cover h1{ font-size:1.7rem; }
     .gate-sprig{ width:24px; max-height:80px; }
     .book-cover p{ font-size:0.86rem; margin-bottom:20px; }
-    .panel-stage{ padding:14px 14px 4px; order:2; }
-    .book{
-      flex-direction:column;
-      width:calc(var(--book-w) + 16px);
-    }
-    nav.tabs{
-      flex-direction:row; flex-wrap:wrap; align-items:flex-end;
-      width:auto; order:1; padding-top:0; padding-left:14px; gap:3px;
-    }
+    .panel-stage{ padding:14px 14px 4px; }
+    .book{ width:calc(var(--book-w) + 16px + 40px); }
+    nav.tabs{ width:34px; padding-top:16px; }
     nav.tabs button{
-      border-radius:10px 10px 0 0;
-      padding:8px 11px 10px; font-size:0.66rem;
-      transform:translateY(3px);
-      writing-mode:horizontal-tb;
-      rotate:0deg;
-      min-height:0;
-      width:auto;
-    }
-    nav.tabs button:hover, nav.tabs button.active{ transform:translateY(0); }
-    nav.tabs button.active::after{
-      left:10px; right:10px; top:auto; bottom:6px; width:auto; height:3px;
+      font-size:0.58rem; padding:8px 4px; min-height:60px;
     }
     .book-footer{ margin-top:8px; }
     .brand h1{ font-size:1.2rem; }
@@ -624,8 +605,9 @@
     .whoami{ font-size:0.72rem; }
   }
   @media (max-width:360px){
-    :root{ --book-w: 90vw; }
-    nav.tabs button{ font-size:0.6rem; padding:7px 8px 9px; }
+    :root{ --book-w: 80vw; }
+    nav.tabs{ width:30px; }
+    nav.tabs button{ font-size:0.54rem; padding:6px 3px; min-height:52px; }
   }
 </style>
 </head>
@@ -1224,6 +1206,33 @@ async function persist(){
   }, 350);
 }
 
+// Saves immediately (no debounce) and waits for it to actually finish.
+// Used for one-off confirmed actions (like clearing chat) where a background
+// poll could otherwise race the save and overwrite the change before it lands.
+let suppressNextChatPoll = false;
+async function persistNow(){
+  clearTimeout(saveTimer);
+  setSync('busy', 'Saving...');
+  suppressNextChatPoll = true;
+  if(CONFIG.MOCK_MODE){
+    try{
+      localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(data));
+      setSync('ok', 'Saved on this device');
+    }catch(e){
+      setSync('err', 'Save failed — storage full');
+      alert("This browser's storage is full, so that last change wasn't saved. Photos take up the most space — try removing an old one, or use smaller photos going forward.");
+    }
+    return;
+  }
+  try{
+    await driveSaveContent(fileId, data);
+    setSync('ok', 'Synced');
+  }catch(e){
+    setSync('err', 'Save failed — check connection');
+    alert("Couldn't save to Google Drive: " + e.message);
+  }
+}
+
 async function refreshFromDrive(){
   if(CONFIG.MOCK_MODE){
     setSync('ok', 'Test mode — nothing to refresh');
@@ -1610,9 +1619,6 @@ $('#chatInput').addEventListener('keydown', (e) => {
   if(e.key === 'Enter'){ e.preventDefault(); sendChat(); }
 });
 
-function initials(name){
-  return (name||'?').trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase();
-}
 function isSameDay(a, b){
   const d1 = new Date(a), d2 = new Date(b);
   return d1.toDateString() === d2.toDateString();
@@ -1637,34 +1643,28 @@ function renderChat(){
   }
   data.chat.forEach((m, i) => {
     const prev = data.chat[i-1];
-    const mine = m.authorEmail === me.email;
+    const sameEmail = (a, b) => (a||'').trim().toLowerCase() === (b||'').trim().toLowerCase();
+    const mine = sameEmail(m.authorEmail, me.email);
     if(!prev || !isSameDay(prev.ts, m.ts)){
       const div = document.createElement('div');
       div.className = 'chat-daydivider';
       div.innerHTML = `<span>${dayLabel(m.ts)}</span>`;
       list.appendChild(div);
     }
-    const grouped = prev && prev.authorEmail === m.authorEmail && isSameDay(prev.ts, m.ts) && (m.ts - prev.ts) < 5 * 60000;
+    const grouped = prev && sameEmail(prev.authorEmail, m.authorEmail) && isSameDay(prev.ts, m.ts) && (m.ts - prev.ts) < 5 * 60000;
 
     const row = document.createElement('div');
     row.className = 'chat-row ' + (mine ? 'mine' : 'theirs') + ' ' + (grouped ? 'grouped' : 'new-group');
 
-    const nameNow = displayNameFor(m.authorEmail, m.author);
-
-    const avatar = document.createElement('div');
-    avatar.className = 'chat-avatar ' + (mine ? 'mine' : 'theirs') + (grouped ? ' spacer' : '');
-    avatar.textContent = initials(nameNow);
-
     const col = document.createElement('div');
     col.className = 'bubble-col';
     col.innerHTML = `
-      ${!grouped ? `<span class="bubble-who">${escapeHtml(nameNow)}</span>` : ''}
       <div class="bubble ${mine ? 'mine' : 'theirs'}">${escapeHtml(m.text)}</div>
       <span class="ts">${fmtTime(m.ts)}</span>
     `;
     col.addEventListener('click', () => col.classList.toggle('show-ts'));
 
-    row.appendChild(avatar);
+    row.appendChild(col);
     row.appendChild(col);
     list.appendChild(row);
   });
@@ -1684,15 +1684,15 @@ function renderChatClearBanner(){
     return;
   }
   banner.style.display = 'flex';
-  if(me && req.by === me.email){
+  if(me && (req.by||'').trim().toLowerCase() === (me.email||'').trim().toLowerCase()){
     banner.innerHTML = `
       <span>Waiting for ${escapeHtml(otherPersonLabel())} to agree to clear the chat...</span>
       <div class="actions-inline"><button class="no-btn" id="cancelClearReqBtn">Cancel request</button></div>
     `;
-    $('#cancelClearReqBtn').addEventListener('click', () => {
+    $('#cancelClearReqBtn').addEventListener('click', async () => {
       data.chatClearRequest = null;
-      persist();
       renderChatClearBanner();
+      await persistNow();
     });
   } else {
     const reqName = displayNameFor(req.by);
@@ -1703,16 +1703,19 @@ function renderChatClearBanner(){
         <button class="yes-btn" id="approveClearBtn">Yes, clear it</button>
       </div>
     `;
-    $('#declineClearBtn').addEventListener('click', () => {
+    $('#declineClearBtn').addEventListener('click', async () => {
       data.chatClearRequest = null;
-      persist();
       renderChatClearBanner();
+      await persistNow();
     });
-    $('#approveClearBtn').addEventListener('click', () => {
+    $('#approveClearBtn').addEventListener('click', async () => {
+      const btn = $('#approveClearBtn');
+      btn.disabled = true;
+      btn.textContent = 'Clearing...';
       data.chat = [];
       data.chatClearRequest = null;
-      persist();
       renderChat();
+      await persistNow();
     });
   }
 }
@@ -1722,7 +1725,7 @@ function otherPersonLabel(){
   return otherEmail ? displayNameFor(otherEmail) : 'the other person';
 }
 
-$('#requestClearChatBtn').addEventListener('click', () => {
+$('#requestClearChatBtn').addEventListener('click', async () => {
   if(!me) return;
   if(data.chatClearRequest){
     alert("There's already a pending clear-chat request.");
@@ -1730,8 +1733,8 @@ $('#requestClearChatBtn').addEventListener('click', () => {
   }
   if(!confirm("Ask to clear the whole chat? It'll only actually clear once the other person agrees.")) return;
   data.chatClearRequest = { by: me.email, ts: Date.now() };
-  persist();
   renderChatClearBanner();
+  await persistNow();
 });
 
 
@@ -1739,6 +1742,7 @@ let chatPollTimer = null;
 function startChatPolling(){
   stopChatPolling();
   chatPollTimer = setInterval(async () => {
+    if(suppressNextChatPoll){ suppressNextChatPoll = false; return; }
     if(CONFIG.MOCK_MODE){
       try{
         const raw = localStorage.getItem(MOCK_STORAGE_KEY);
@@ -2004,6 +2008,13 @@ function escapeHtml(s){
 
 /* light auto-refresh so you both stay roughly in sync while both apps are open */
 setInterval(() => { if(fileId && accessToken) refreshFromDrive(); }, 60000);
+
+/* register the service worker so Chrome/Android offer a real "Install app" option */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
