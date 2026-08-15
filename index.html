@@ -1044,13 +1044,11 @@ async function tryPinUnlock(){
     return;
   }
   if(!tokenClient){ alert("Still loading Google sign-in, try again in a second."); return; }
-  setSync('busy', 'Unlocking...');
-  // Ask Google for a fresh token without the full account-picker/consent screen when possible.
-  // If the browser session has expired, Google will fall back to showing the picker anyway.
-  pendingPinUnlockEmail = email;
-  tokenClient.requestAccessToken({ prompt: '', hint: email });
+  setSync('busy', 'Opening...');
+  // Let Google handle its normal, reliable flow — just pre-fill the right account
+  // so it's a single tap rather than picking from scratch.
+  tokenClient.requestAccessToken({ hint: email });
 }
-let pendingPinUnlockEmail = null;
 
 $('#pinUnlockBtn').addEventListener('click', tryPinUnlock);
 $('#pinInput').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); tryPinUnlock(); } });
@@ -1064,16 +1062,9 @@ function initGoogle(){
       scope: CONFIG.SCOPE,
       callback: async (resp) => {
         if(resp.error){
-          if(pendingPinUnlockEmail){
-            pendingPinUnlockEmail = null;
-            setSync('err', '');
-            alert("Couldn't unlock silently — your Google session needs a fresh sign-in. Use \"Use Google sign-in instead\" below.");
-            return;
-          }
           alert("Sign-in failed: " + resp.error);
           return;
         }
-        pendingPinUnlockEmail = null;
         accessToken = resp.access_token;
         await afterSignIn();
       }
@@ -1094,8 +1085,7 @@ $('#signInBtn').addEventListener('click', () => {
   if(!tokenClient){ alert("Still loading Google sign-in, try again in a second."); return; }
   if($('#signInBtn').dataset.quickReopen === 'true'){
     const email = getLastEmail();
-    pendingPinUnlockEmail = email;
-    tokenClient.requestAccessToken({ prompt: '', hint: email });
+    tokenClient.requestAccessToken({ hint: email });
   } else {
     tokenClient.requestAccessToken();
   }
