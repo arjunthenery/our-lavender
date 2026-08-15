@@ -1522,7 +1522,15 @@ $('#addPostBtn').addEventListener('click', async () => {
     }
     if(wasEditing){
       const post = data.posts.find(x => x.id === wasEditing);
-      if(post){ post.caption = caption; post.img = img; }
+      if(post){
+        post.caption = caption;
+        post.img = img;
+        // Repair old/broken posts that never got an author attached in the first place.
+        if(!post.authorEmail){
+          post.authorEmail = me.email;
+          post.author = me.name;
+        }
+      }
       cancelPostEdit();
     } else {
       data.posts.unshift({
