@@ -204,6 +204,12 @@
     font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700;
     font-size:1.15rem; margin:0; color:var(--plum); opacity:0.85;
   }
+  .who-badge{
+    width:22px; height:22px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:0.68rem;
+    color:#fff; background:var(--rose);
+  }
   .whoami{ display:flex; align-items:center; gap:8px; font-size:0.8rem; color:var(--plum-2); }
   .icon-btn{
     width:30px; height:30px; padding:0 !important; border-radius:50%;
@@ -699,6 +705,7 @@
       <div class="brand">
         <svg width="16" height="48" viewBox="0 0 70 210" style="flex-shrink:0;"><use href="#lavSprig"></use></svg>
         <h1 id="brandTitle">Our Lavender</h1>
+        <span class="who-badge" id="whoBadge">?</span>
       </div>
       <div class="whoami">
         <button class="btn ghost small icon-btn" id="footerRefreshBtn" aria-label="Refresh from Drive" title="Refresh from Drive">
@@ -853,8 +860,8 @@ const CONFIG = {
 // is auto-detected from which Google account signs in — no need to ask.
 // Nicknames (set in Settings) override these and are shared between you both.
 const KNOWN_PEOPLE = {
-  "arjuntm3101@gmail.com": "Arjun",
-  "veenaravindran96@gmail.com": "Veena"
+  "arjuntm3101@gmail.com": "Juju",
+  "veenaravindran96@gmail.com": "Veenchi"
 };
 
 let accessToken = null;
@@ -943,6 +950,13 @@ $('#signOutBtn').addEventListener('click', () => {
   $('#gate').style.display = 'flex';
 });
 
+function updateWhoBadge(){
+  const badge = $('#whoBadge');
+  if(!badge || !me || !me.name) return;
+  badge.textContent = me.name.trim()[0].toUpperCase();
+  badge.title = me.name;
+}
+
 async function afterSignIn(){
   setSync('busy', 'Signing in...');
   const uRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -953,6 +967,7 @@ async function afterSignIn(){
 
   await loadData(); // brings in data.nicknames from the shared file
   me.name = displayNameFor(me.email);
+  updateWhoBadge();
 
   $('#nicknameCard').style.display = 'flex';
   renderNicknameInputs();
@@ -975,6 +990,7 @@ function afterSignInMock(){
   const name = stored?.name || prompt("Test mode — what's your name? (just for telling posts apart)", "You") || "You";
   me = { name, email: name.toLowerCase().replace(/\s+/g,'') + '@local.test', picture: '' };
   try{ localStorage.setItem(MOCK_ME_KEY, JSON.stringify(me)); }catch(e){}
+  updateWhoBadge();
 
   try{
     const raw = localStorage.getItem(MOCK_STORAGE_KEY);
@@ -1812,6 +1828,7 @@ $('#saveNicknamesBtn').addEventListener('click', () => {
     else delete data.nicknames[email];
   });
   if(me && me.email) me.name = displayNameFor(me.email);
+  updateWhoBadge();
   renderAll();
   persist();
   alert("Nicknames saved — updated everywhere for both of you.");
