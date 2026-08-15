@@ -72,13 +72,6 @@
     color:#2B1B24; opacity:0.35;
     pointer-events:none; font-family:'Nunito Sans',sans-serif;
   }
-  .copyright-page{
-    position:absolute; left:0; right:0; bottom:0;
-    text-align:center; font-size:0.72rem; letter-spacing:0.01em;
-    color:#2B1B24; opacity:0.28;
-    pointer-events:none; font-family:'Nunito Sans',sans-serif;
-    z-index:0;
-  }
   .book-cover{
     position:relative;
     width:var(--book-w);
@@ -729,12 +722,11 @@
 
   <div class="panel-stage">
   <div class="tab-dots" id="tabDots"></div>
-  <div class="copyright-page">© 2026 Arjun Thenery Maniknatan</div>
   <!-- FEED -->
   <section class="panel active" id="panel-feed">
     <div class="panel-content">
     <div class="card composer">
-      <label class="field-label">Add a memory</label>
+      <h2 class="section-title">Add a memory</h2>
       <input type="text" id="postCaption" placeholder="Write a little caption...">
       <div class="actions" style="margin-top:2px;">
         <label class="btn small ghost attach-photo-btn" for="postImage">Attach Photo</label>
