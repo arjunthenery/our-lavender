@@ -614,16 +614,17 @@
   .crop-handle[data-corner="se"]{ top:100%; left:100%; cursor:nwse-resize; }
 
   @media (max-width:560px){
-    :root{ --book-w: 84vw; --book-h: min(78vh, 700px); }
-    .book.tabs-hidden{ --book-w: 95vw; }
+    :root{ --book-w: 92vw; --book-h: min(85vh, 760px); }
+    .book.tabs-hidden{ --book-w: 97vw; }
+    #app{ padding:10px 8px 8px; }
     .note{ max-width:92%; }
     .plan{ flex-wrap:wrap; }
     .book-cover{ padding:20px 18px; }
     .book-cover h1{ font-size:1.7rem; }
     .gate-sprig{ width:24px; max-height:80px; }
     .book-cover p{ font-size:0.86rem; margin-bottom:20px; }
-    .panel-stage{ padding:14px 14px 4px; }
-    .book{ width:calc(var(--book-w) + 16px + 40px); }
+    .panel-stage{ padding:12px 10px 4px; }
+    .book{ width:calc(var(--book-w) + 14px + 34px); padding-left:14px; }
     nav.tabs{ width:34px; padding-top:16px; }
     nav.tabs button{
       font-size:0.58rem; padding:8px 4px; min-height:60px;
@@ -635,8 +636,8 @@
     .whoami{ font-size:0.72rem; }
   }
   @media (max-width:360px){
-    :root{ --book-w: 80vw; }
-    .book.tabs-hidden{ --book-w: 95vw; }
+    :root{ --book-w: 90vw; }
+    .book.tabs-hidden{ --book-w: 97vw; }
     nav.tabs{ width:30px; }
     nav.tabs button{ font-size:0.54rem; padding:6px 3px; min-height:52px; }
   }
