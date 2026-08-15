@@ -29,7 +29,7 @@
     --book-w: min(96vw, 620px);
     --book-h: min(88vh, 820px);
   }
-  html, body{ overflow-x:hidden; }
+  html, body{ height:100%; overflow:hidden; overscroll-behavior:none; }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
@@ -57,13 +57,13 @@
   /* ---------- Sign-in gate ---------- */
   #gate{
     height:100vh; height:100dvh;
-    overflow-y:auto;
+    overflow:hidden;
     display:flex;
     align-items:center;
     justify-content:center;
     flex-direction:column;
     text-align:center;
-    padding:12px;
+    padding:10px;
     box-sizing:border-box;
   }
   .book-cover{
@@ -684,7 +684,7 @@
     body.simple-layout #gate,
     body.simple-layout #app{
       --book-w: 98vw;
-      --book-h: 95dvh;
+      --book-h: 92dvh;
     }
     body.simple-layout .book{ width:calc(var(--book-w) + 34px); padding-left:0; }
     body.simple-layout #app{ padding:6px 6px 4px; }
