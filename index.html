@@ -641,6 +641,40 @@
     nav.tabs{ width:30px; }
     nav.tabs button{ font-size:0.54rem; padding:6px 3px; min-height:52px; }
   }
+
+  /* Simple layout: drop the book chrome for a plain, near-full-screen layout */
+  body.simple-layout .book-cover::before,
+  body.simple-layout .book-cover::after,
+  body.simple-layout .panel-stage::before,
+  body.simple-layout .panel-stage::after{
+    display:none;
+  }
+  body.simple-layout .book-cover{
+    box-shadow:0 10px 26px rgba(74,49,120,0.28);
+    border-radius:16px;
+  }
+  body.simple-layout .panel-stage{
+    box-shadow:0 6px 20px rgba(74,49,120,0.14);
+    border-radius:16px;
+  }
+  body.simple-layout .book{ padding-left:0; }
+  body.simple-layout,
+  body.simple-layout #gate,
+  body.simple-layout #app{
+    --book-w: min(98vw, 900px);
+    --book-h: min(94dvh, 980px);
+  }
+  @media (max-width:560px){
+    body.simple-layout,
+    body.simple-layout #gate,
+    body.simple-layout #app{
+      --book-w: 98vw;
+      --book-h: 95dvh;
+    }
+    body.simple-layout .book{ width:calc(var(--book-w) + 34px); padding-left:0; }
+    body.simple-layout #app{ padding:6px 6px 4px; }
+    body.simple-layout .panel-stage{ padding:12px 10px 4px; }
+  }
 </style>
 </head>
 <body>
@@ -831,6 +865,16 @@
         </div>
         <label class="switch">
           <input type="checkbox" id="hideTabsToggle">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <label class="field-label" style="margin-bottom:2px;">Simple layout</label>
+          <p style="font-size:0.76rem;color:var(--plum-2); margin:0;">Drops the spine, shadows, and page-turn styling for a plain full-screen layout — more usable space, less "book." Everything still works the same underneath. Just a display setting on this device.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="simpleLayoutToggle">
           <span class="switch-slider"></span>
         </label>
       </div>
@@ -1282,6 +1326,25 @@ function applyHideTabsPref(){
   if(toggle) toggle.checked = hide;
   buildTabDots();
 }
+
+function getSimpleLayoutPref(){
+  try{ return localStorage.getItem('ourlavender-simple-layout') === 'true'; }catch(e){ return false; }
+}
+function setSimpleLayoutPref(val){
+  try{ localStorage.setItem('ourlavender-simple-layout', val ? 'true' : 'false'); }catch(e){}
+}
+function applySimpleLayoutPref(){
+  const simple = getSimpleLayoutPref();
+  document.body.classList.toggle('simple-layout', simple);
+  const toggle = $('#simpleLayoutToggle');
+  if(toggle) toggle.checked = simple;
+}
+$('#simpleLayoutToggle').addEventListener('change', (e) => {
+  setSimpleLayoutPref(e.target.checked);
+  document.body.classList.toggle('simple-layout', e.target.checked);
+});
+applySimpleLayoutPref();
+
 $('#hideTabsToggle').addEventListener('change', (e) => {
   setHideTabsPref(e.target.checked);
   $('.book').classList.toggle('tabs-hidden', e.target.checked);
