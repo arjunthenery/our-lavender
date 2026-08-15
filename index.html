@@ -754,15 +754,17 @@
     <div class="card composer">
       <label class="field-label">Add a memory</label>
       <input type="text" id="postCaption" placeholder="Write a little caption...">
-      <label class="btn small ghost attach-photo-btn" for="postImage">Attach Photo</label>
-      <input type="file" id="postImage" accept="image/*" class="visually-hidden">
+      <div class="actions" style="margin-top:2px;">
+        <label class="btn small ghost attach-photo-btn" for="postImage">Attach Photo</label>
+        <input type="file" id="postImage" accept="image/*" class="visually-hidden">
+        <div style="display:flex; gap:8px;">
+          <button class="btn small ghost" id="cancelPostEditBtn" style="display:none;">Cancel</button>
+          <button class="btn small" id="addPostBtn">Pin it</button>
+        </div>
+      </div>
       <div id="postImgPreviewWrap" style="display:none; margin-top:10px; align-items:center; gap:10px;">
         <img id="postImgPreview" alt="" style="width:60px; height:60px; object-fit:cover; border-radius:8px; box-shadow:var(--shadow);">
         <button type="button" class="btn ghost small" id="recropBtn">Recrop</button>
-      </div>
-      <div class="actions" style="justify-content:flex-end; margin-top:14px;">
-        <button class="btn small ghost" id="cancelPostEditBtn" style="display:none;">Cancel</button>
-        <button class="btn small" id="addPostBtn">Pin it</button>
       </div>
     </div>
     <div id="feedList"></div>
