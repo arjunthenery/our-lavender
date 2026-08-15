@@ -408,7 +408,7 @@
     display:inline-flex; align-items:center; justify-content:center;
     width:fit-content; cursor:pointer;
   }
-  .composer .actions{ display:flex; justify-content:space-between; align-items:center; }
+  .composer .actions{ display:flex; flex-wrap:nowrap; justify-content:space-between; align-items:center; gap:8px; }
   #feedList{ display:flex; flex-direction:column; gap:22px; margin-top:8px;}
   .post{
     background:#fff;
@@ -651,6 +651,7 @@
     .book.tabs-hidden{ --book-w: 97vw; }
     nav.tabs{ width:30px; }
     nav.tabs button{ font-size:0.54rem; padding:6px 3px; min-height:52px; }
+    .composer .actions .btn{ padding:7px 12px; font-size:0.76rem; }
   }
 
   /* Simple layout: drop the book chrome for a plain, near-full-screen layout */
