@@ -925,7 +925,6 @@ $('#signInBtn').addEventListener('click', () => {
 });
 
 $('#signOutBtn').addEventListener('click', () => {
-  if(accessToken){ google.accounts.oauth2.revoke(accessToken, () => {}); }
   accessToken = null; me = null; data = null; fileId = null;
   $('#app').classList.remove('shown');
   $('#gate').style.display = 'flex';
@@ -1379,14 +1378,19 @@ function openCropModal(dataUrl){
     cropResolve = resolve;
     const imgEl = $('#cropImg');
     imgEl.onload = () => {
-      const w = imgEl.clientWidth, h = imgEl.clientHeight;
-      // Start as a small square centered in the middle — easy to grab and
-      // drag from there, rather than starting nearly full-size with no room to move.
-      const side = Math.min(w, h) * 0.4;
-      const bw = side, bh = side;
-      cropBoxRect = { x: (w - bw) / 2, y: (h - bh) / 2, w: bw, h: bh };
-      updateCropBoxUI();
+      // Show the modal FIRST — while it's still display:none, the image has
+      // no real width/height to measure, which was collapsing the box to 0x0
+      // in the corner. Measuring has to happen after it's actually visible.
       $('#cropModal').classList.add('open');
+      requestAnimationFrame(() => {
+        const w = imgEl.clientWidth, h = imgEl.clientHeight;
+        // Small square centered in the middle — easy to grab and drag from
+        // there, rather than starting nearly full-size with no room to move.
+        const side = Math.min(w, h) * 0.4;
+        const bw = side, bh = side;
+        cropBoxRect = { x: (w - bw) / 2, y: (h - bh) / 2, w: bw, h: bh };
+        updateCropBoxUI();
+      });
     };
     imgEl.src = dataUrl;
   });
