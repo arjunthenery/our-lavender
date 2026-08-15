@@ -1294,6 +1294,53 @@ $all('nav.tabs button').forEach(btn => {
   });
 });
 
+/* ---------------- Swipe to turn pages (mobile) ---------------- */
+function goToAdjacentTab(direction){ // -1 = previous, 1 = next
+  const buttons = $all('nav.tabs button');
+  const currentIndex = buttons.findIndex(b => b.classList.contains('active'));
+  const nextIndex = currentIndex + direction;
+  if(nextIndex < 0 || nextIndex >= buttons.length) return;
+  buttons.forEach(b => b.classList.remove('active'));
+  buttons[nextIndex].classList.add('active');
+  switchToTab(buttons[nextIndex].dataset.tab);
+  buttons[nextIndex].scrollIntoView({ behavior:'smooth', block:'nearest', inline:'nearest' });
+}
+
+(function setupSwipeNav(){
+  const stage = $('.panel-stage');
+  if(!stage) return;
+  let startX = 0, startY = 0, tracking = false, locked = null; // locked: 'h' | 'v' | null
+
+  stage.addEventListener('touchstart', (e) => {
+    if(e.touches.length !== 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    tracking = true;
+    locked = null;
+  }, { passive:true });
+
+  stage.addEventListener('touchmove', (e) => {
+    if(!tracking || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if(!locked && (Math.abs(dx) > 10 || Math.abs(dy) > 10)){
+      locked = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+    }
+    // once a horizontal swipe is clearly happening, stop the page from scrolling vertically
+    if(locked === 'h' && e.cancelable) e.preventDefault();
+  }, { passive:false });
+
+  stage.addEventListener('touchend', (e) => {
+    if(!tracking) return;
+    tracking = false;
+    if(locked !== 'h') return;
+    const dx = (e.changedTouches[0].clientX - startX);
+    const threshold = 60;
+    if(dx <= -threshold) goToAdjacentTab(1);   // swiped left -> next page
+    else if(dx >= threshold) goToAdjacentTab(-1); // swiped right -> previous page
+  });
+})();
+
 /* ---------------- Feed ---------------- */
 function fileToDataUrl(file){
   return new Promise((res, rej) => {
