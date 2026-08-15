@@ -398,6 +398,14 @@
 
   /* Feed / polaroids */
   .composer{ display:flex; flex-direction:column; gap:10px; }
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+  .attach-photo-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:fit-content; cursor:pointer;
+  }
   .composer .actions{ display:flex; justify-content:space-between; align-items:center; }
   #feedList{ display:flex; flex-direction:column; gap:22px; margin-top:8px;}
   .post{
@@ -744,13 +752,13 @@
     <div class="card composer">
       <label class="field-label">Add a memory</label>
       <input type="text" id="postCaption" placeholder="Write a little caption...">
-      <input type="file" id="postImage" accept="image/*">
-      <div id="postImgPreviewWrap" style="display:none; margin-top:8px; align-items:center; gap:10px;">
+      <label class="btn small ghost attach-photo-btn" for="postImage">Attach Photo</label>
+      <input type="file" id="postImage" accept="image/*" class="visually-hidden">
+      <div id="postImgPreviewWrap" style="display:none; margin-top:10px; align-items:center; gap:10px;">
         <img id="postImgPreview" alt="" style="width:60px; height:60px; object-fit:cover; border-radius:8px; box-shadow:var(--shadow);">
         <button type="button" class="btn ghost small" id="recropBtn">Recrop</button>
       </div>
-      <div class="actions">
-        <span style="font-size:0.72rem;color:var(--plum-2);">Photos are automatically resized when you pin them, so any size works.</span>
+      <div class="actions" style="justify-content:flex-end; margin-top:14px;">
         <button class="btn small ghost" id="cancelPostEditBtn" style="display:none;">Cancel</button>
         <button class="btn small" id="addPostBtn">Pin it</button>
       </div>
