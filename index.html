@@ -76,8 +76,8 @@
     padding:28px 30px;
     border-radius:6px 26px 26px 6px;
     background:
-      radial-gradient(circle at 30% 15%, rgba(255,255,255,0.10), transparent 55%),
-      linear-gradient(160deg, var(--plum), var(--plum-2) 85%);
+      radial-gradient(circle at 30% 15%, rgba(255,255,255,0.22), transparent 55%),
+      linear-gradient(160deg, #E6C9D9, #966E96 85%);
     box-shadow:
       12px 12px 0 -5px var(--paper-2),
       20px 22px 0 -10px var(--rose-soft),
@@ -101,11 +101,10 @@
   }
   .book-cover-inner{
     position:relative;
-    border:1.5px solid rgba(255,240,248,0.28);
-    border-radius:4px 18px 18px 4px;
     padding:26px 20px;
     overflow-y:auto;
     max-height:100%;
+    background: radial-gradient(ellipse 68% 62% at center, rgba(43,27,36,0.16), transparent 72%);
   }
   .ribbon{
     position:absolute; top:-2px; left:50%; transform:translateX(-50%);
@@ -116,19 +115,31 @@
   }
   .gate-sprig{ width:34px; height:auto; max-height:112px; flex-shrink:0; }
   .gate-sprig.flip{ transform:scaleX(-1); }
+  .gate-sprig-top{
+    width:36px; height:auto; max-height:113px; flex-shrink:0; margin-bottom:4px;
+    transform-origin:bottom center;
+    animation:sprigSway 4.5s ease-in-out infinite;
+  }
+  @keyframes sprigSway{
+    0%, 100%{ transform:rotate(-3deg); }
+    50%{ transform:rotate(3deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .gate-sprig-top{ animation:none; }
+  }
   .book-cover h1{
     font-family:'Cormorant Garamond', serif;
     font-weight:700;
-    font-style:italic;
+    font-style:normal;
     font-size:clamp(2rem, 6vw, 3rem);
-    margin:0 0 6px;
+    margin:0 0 18px;
     color:var(--gold);
     text-shadow:0 1px 0 rgba(0,0,0,0.2);
   }
   .book-cover p{
     max-width:360px;
-    color:#F3E4EE;
-    opacity:0.88;
+    color:#4A3358;
+    opacity:0.92;
     line-height:1.6;
     margin:0 auto 30px;
     font-size:0.98rem;
@@ -136,14 +147,14 @@
   .book-cover .btn{
     background:linear-gradient(135deg, var(--gold), #ECD09B);
     color:var(--plum);
-    box-shadow:0 6px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+    box-shadow:0 6px 16px rgba(74,49,120,0.25), inset 0 1px 0 rgba(255,255,255,0.5);
   }
-  .book-cover #configNotice{ color:#F3D9E6; }
+  .book-cover #configNotice{ color:#5C4468; }
   .book-cover .btn.ghost{
-    background:transparent; color:#F3D9E6; box-shadow:none;
-    border:1.5px solid rgba(255,240,248,0.3);
+    background:transparent; color:#4A3358; box-shadow:none;
+    border:1.5px solid rgba(74,49,120,0.3);
   }
-  .book-cover .btn.ghost:hover{ color:#fff; }
+  .book-cover .btn.ghost:hover{ color:#2E2140; }
   .btn{
     font-family:'Nunito Sans',sans-serif;
     font-weight:700;
@@ -201,7 +212,7 @@
   }
   .brand{ display:flex; align-items:center; gap:12px; }
   .brand h1{
-    font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:700;
+    font-family:'Cormorant Garamond',serif; font-style:normal; font-weight:700;
     font-size:1.15rem; margin:0; color:var(--plum); opacity:0.85;
   }
   .who-badge{
@@ -578,6 +589,7 @@
     .book-cover{ padding:20px 18px; }
     .book-cover h1{ font-size:1.7rem; }
     .gate-sprig{ width:24px; max-height:80px; }
+    .gate-sprig-top{ width:28px; max-height:88px; }
     .book-cover p{ font-size:0.86rem; margin-bottom:20px; }
     .panel-stage{ padding:12px 10px 4px; }
     .book{ width:calc(var(--book-w) + 14px + 34px); padding-left:14px; }
@@ -642,22 +654,33 @@
 <svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
   <symbol id="lavSprig" viewBox="0 0 70 210">
     <!-- stem -->
-    <path d="M35 207 C33 165, 37 120, 35 66" fill="none" stroke="#6E8A63" stroke-width="2.6" stroke-linecap="round"/>
-    <!-- leaves -->
-    <path d="M35 179 C18 175, 6 159, 2 143 C16 147, 30 163, 35 179 Z" fill="#93AE8C" opacity="0.9"/>
-    <path d="M35 187 C52 182, 66 167, 70 151 C54 155, 38 171, 35 187 Z" fill="#7C9A76" opacity="0.9"/>
+    <path d="M35 207 C31 175, 39 140, 33 108 C29 85, 38 60, 35 40" fill="none" stroke="#6E8A63" stroke-width="2.4" stroke-linecap="round"/>
+    <!-- lower leaves -->
+    <path d="M33.5 178 C22 175, 10 167, 4 155 C1.5 149.5, 0.5 144.5, 1.5 140 C6 145.5, 12.5 152, 19.5 158.5 C25 163.5, 29.5 168.5, 33.5 178 Z" fill="#93AE8C"/>
+    <path d="M33.5 178 C25 172, 15 165, 9 155" fill="none" stroke="#7C9A76" stroke-width="0.7" opacity="0.6"/>
+    <path d="M34.5 186 C46.5 183, 59 175, 66 163 C68.7 157, 69.8 152, 68.7 147.5 C64 153.5, 57.2 160.5, 49.8 167.3 C44 172.5, 39 177.5, 34.5 186 Z" fill="#7C9A76"/>
+    <path d="M34.5 186 C43.5 179.5, 53.5 172, 60 162" fill="none" stroke="#6B8865" stroke-width="0.7" opacity="0.6"/>
+    <!-- upper leaves -->
+    <path d="M32 152 C24 148, 16 141, 12 131 C10.3 127, 9.7 123.3, 10.3 120 C13.7 124.5, 18.6 129.7, 23.9 134.9 C27.7 138.7, 30.3 143.6, 32 152 Z" fill="#9DB694" opacity="0.95"/>
+    <path d="M36 158 C44.5 155, 53 148.5, 57.5 139 C59.4 135, 60.1 131.3, 59.4 128 C55.7 132.3, 50.4 137.3, 44.6 142.4 C41 146.5, 38 151.5, 36 158 Z" fill="#87A17D" opacity="0.95"/>
     <!-- spike: whorls of florets, tapering and lightening toward the tip -->
     <g>
-      <circle cx="21" cy="117" r="4.6" fill="#A5699B"/><circle cx="35" cy="113.5" r="4.6" fill="#A5699B"/><circle cx="49" cy="115" r="4.6" fill="#A5699B"/>
-      <circle cx="22.5" cy="106" r="4.3" fill="#B67AA9"/><circle cx="35" cy="102.5" r="4.3" fill="#B67AA9"/><circle cx="47.5" cy="104" r="4.3" fill="#B67AA9"/>
-      <circle cx="24" cy="96" r="4.0" fill="#C68CB6"/><circle cx="35" cy="92.5" r="4.0" fill="#C68CB6"/><circle cx="46" cy="94" r="4.0" fill="#C68CB6"/>
-      <circle cx="25.5" cy="87" r="3.7" fill="#D69EC5"/><circle cx="35" cy="83.5" r="3.7" fill="#D69EC5"/><circle cx="44.5" cy="85" r="3.7" fill="#D69EC5"/>
-      <circle cx="27" cy="78" r="3.4" fill="#E6AECB"/><circle cx="35" cy="75" r="3.4" fill="#E6AECB"/><circle cx="43" cy="76.5" r="3.4" fill="#E6AECB"/>
-      <circle cx="28.5" cy="70" r="3.0" fill="#ECBFD5"/><circle cx="35" cy="67.5" r="3.0" fill="#ECBFD5"/><circle cx="41.5" cy="68.5" r="3.0" fill="#ECBFD5"/>
-      <circle cx="30" cy="62" r="2.6" fill="#F1D0DF"/><circle cx="35" cy="60" r="2.6" fill="#F1D0DF"/><circle cx="40" cy="61" r="2.6" fill="#F1D0DF"/>
-      <circle cx="31.5" cy="55" r="2.2" fill="#F6DFE9"/><circle cx="35" cy="53" r="2.2" fill="#F6DFE9"/><circle cx="38.5" cy="54" r="2.2" fill="#F6DFE9"/>
-      <circle cx="32.5" cy="49" r="1.8" fill="#FAEBF1"/><circle cx="35" cy="47.5" r="1.8" fill="#FAEBF1"/><circle cx="37.5" cy="48.5" r="1.8" fill="#FAEBF1"/>
-      <circle cx="35" cy="42" r="2.3" fill="#FDF5F8"/>
+      <circle cx="12.0" cy="117" r="8.9" fill="#A5699B"/><circle cx="35" cy="111" r="9.4" fill="#A5699B"/><circle cx="58.0" cy="115" r="8.8" fill="#A5699B"/>
+      <circle cx="14.6" cy="103" r="8.4" fill="#B67AA9"/><circle cx="35" cy="97" r="8.8" fill="#B67AA9"/><circle cx="55.4" cy="101" r="8.3" fill="#B67AA9"/>
+      <circle cx="17.5" cy="89.8" r="7.8" fill="#C68CB6"/><circle cx="35" cy="84" r="8.3" fill="#C68CB6"/><circle cx="52.5" cy="87.9" r="7.7" fill="#C68CB6"/>
+      <circle cx="20.4" cy="77.4" r="7.3" fill="#D69EC5"/><circle cx="35" cy="71.9" r="7.7" fill="#D69EC5"/><circle cx="49.6" cy="75.4" r="7.1" fill="#D69EC5"/>
+      <circle cx="23.4" cy="65.9" r="6.6" fill="#E6AECB"/><circle cx="35" cy="60.9" r="7.0" fill="#E6AECB"/><circle cx="46.6" cy="64.1" r="6.5" fill="#E6AECB"/>
+      <circle cx="26.3" cy="55.4" r="5.9" fill="#ECBFD5"/><circle cx="35" cy="50.9" r="6.2" fill="#ECBFD5"/><circle cx="43.7" cy="53.9" r="5.7" fill="#ECBFD5"/>
+      <circle cx="29.0" cy="45.9" r="5.1" fill="#F1D0DF"/><circle cx="35" cy="41.9" r="5.4" fill="#F1D0DF"/><circle cx="41.0" cy="44.9" r="4.9" fill="#F1D0DF"/>
+      <circle cx="31.7" cy="37.4" r="4.3" fill="#F6DFE9"/><circle cx="35" cy="33.9" r="4.5" fill="#F6DFE9"/><circle cx="38.3" cy="36.4" r="4.1" fill="#F6DFE9"/>
+      <circle cx="33.4" cy="29.2" r="3.4" fill="#FAEBF1"/><circle cx="35" cy="25.8" r="3.7" fill="#FAEBF1"/><circle cx="36.6" cy="28.7" r="3.3" fill="#FAEBF1"/>
+      <circle cx="35" cy="19.5" r="3.4" fill="#FDF5F8"/>
+    </g>
+    <!-- glossy highlight dots for a bit of dimension -->
+    <g fill="#ffffff" opacity="0.5">
+      <circle cx="9" cy="114" r="2.0"/><circle cx="32" cy="107" r="2.1"/><circle cx="55" cy="111.8" r="2.0"/>
+      <circle cx="11.7" cy="100" r="1.9"/><circle cx="32" cy="93.4" r="2.0"/><circle cx="52.4" cy="98" r="1.9"/>
+      <circle cx="14.7" cy="87" r="1.7"/><circle cx="32" cy="80.4" r="1.9"/><circle cx="49.5" cy="84.9" r="1.6"/>
     </g>
   </symbol>
 </svg>
@@ -668,10 +691,9 @@
   <div class="book-cover">
     <div class="ribbon"></div>
     <div class="book-cover-inner">
-      <div style="display:flex; align-items:center; gap:16px; justify-content:center;">
-        <svg class="gate-sprig" viewBox="0 0 70 210"><use href="#lavSprig"></use></svg>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
+        <svg class="gate-sprig-top" viewBox="0 0 70 210"><use href="#lavSprig"></use></svg>
         <h1>Our Lavender</h1>
-        <svg class="gate-sprig flip" viewBox="0 0 70 210"><use href="#lavSprig"></use></svg>
       </div>
       <p id="gateTagline">A little corner of the internet just for the two of us</p>
       <button class="btn" id="signInBtn">Sign in with Google</button>
