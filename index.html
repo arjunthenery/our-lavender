@@ -260,6 +260,42 @@
     background:var(--rose); opacity:0.8; border-radius:2px;
   }
 
+  /* Hide-tabs mode: swipe becomes primary nav, freeing up width */
+  .book.tabs-hidden nav.tabs{ display:none; }
+  .book.tabs-hidden{ width:calc(var(--book-w) + 16px) !important; --book-w: min(98vw, 680px); }
+  .book.tabs-hidden .panel-stage{ border-radius:14px; }
+
+  .tab-dots{
+    display:none;
+    grid-row:1; grid-column:1;
+    align-items:center; justify-content:center; gap:7px;
+    padding-bottom:10px;
+  }
+  .tabs-hidden .tab-dots{ display:flex; }
+  .tab-dots button{
+    width:7px; height:7px; border-radius:50%; border:none; padding:0; cursor:pointer;
+    background:var(--paper-2); transition:all .15s ease;
+  }
+  .tab-dots button.active{ background:var(--rose); width:18px; border-radius:4px; }
+
+  /* Settings toggle switch */
+  .toggle-row{
+    display:flex; align-items:center; justify-content:space-between; gap:14px;
+  }
+  .switch{ position:relative; display:inline-block; width:42px; height:24px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch-slider{
+    position:absolute; inset:0; background:var(--paper-2); border-radius:999px; cursor:pointer;
+    transition:background .15s ease;
+  }
+  .switch-slider::before{
+    content:""; position:absolute; width:18px; height:18px; left:3px; top:3px;
+    background:#fff; border-radius:50%; transition:transform .15s ease;
+    box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+  .switch input:checked + .switch-slider{ background:var(--rose); }
+  .switch input:checked + .switch-slider::before{ transform:translateX(18px); }
+
   .book{
     position:relative; padding-left:16px; padding-bottom:14px;
     width:calc(var(--book-w) + 16px + 54px);
@@ -273,6 +309,7 @@
   }
   .panel-stage{
     display:grid;
+    grid-template-rows:auto 1fr;
     perspective:1800px;
     position:relative;
     background:var(--paper);
@@ -309,7 +346,7 @@
 
   section.panel{
     display:none;
-    grid-area:1 / 1;
+    grid-row:2; grid-column:1;
     transform-origin:left center;
     backface-visibility:hidden;
     min-width:0;
@@ -586,6 +623,7 @@
 
   @media (max-width:560px){
     :root{ --book-w: 84vw; --book-h: min(74vh, 660px); }
+    .book.tabs-hidden{ --book-w: 95vw; }
     .note{ max-width:92%; }
     .plan{ flex-wrap:wrap; }
     .book-cover{ padding:20px 18px; }
@@ -606,6 +644,7 @@
   }
   @media (max-width:360px){
     :root{ --book-w: 80vw; }
+    .book.tabs-hidden{ --book-w: 95vw; }
     nav.tabs{ width:30px; }
     nav.tabs button{ font-size:0.54rem; padding:6px 3px; min-height:52px; }
   }
@@ -672,6 +711,7 @@
   </nav>
 
   <div class="panel-stage">
+  <div class="tab-dots" id="tabDots"></div>
   <!-- FEED -->
   <section class="panel active" id="panel-feed">
     <div class="panel-content">
@@ -797,6 +837,16 @@
         </div>
       </div>
       <div id="syncStatus"><span class="dot" id="syncDot"></span><span id="syncText">Synced</span></div>
+      <div class="toggle-row">
+        <div>
+          <label class="field-label" style="margin-bottom:2px;">Hide page tabs</label>
+          <p style="font-size:0.76rem;color:var(--plum-2); margin:0;">Uses the full width for content. Swipe left/right to turn pages instead — a few small dots show where you are and let you jump to a page directly. This is just a display setting on this device.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="hideTabsToggle">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
       <p style="font-size:0.78rem;color:var(--plum-2);">
         Data lives as one JSON file inside your shared Google Drive folder, so both of you always see the same thing.
         Nobody else can read it unless you share the folder further.
@@ -1284,6 +1334,8 @@ function switchToTab(tabName){
 
   if(tabName === 'chat'){ startChatPolling(); renderChat(); }
   else { stopChatPolling(); }
+
+  updateActiveDot(tabName);
 }
 
 $all('nav.tabs button').forEach(btn => {
@@ -1293,6 +1345,48 @@ $all('nav.tabs button').forEach(btn => {
     switchToTab(btn.dataset.tab);
   });
 });
+
+/* ---------------- Hide-tabs mode (settings toggle + dot nav) ---------------- */
+function getHideTabsPref(){
+  try{ return localStorage.getItem('ourlavender-hide-tabs') === 'true'; }catch(e){ return false; }
+}
+function setHideTabsPref(val){
+  try{ localStorage.setItem('ourlavender-hide-tabs', val ? 'true' : 'false'); }catch(e){}
+}
+function buildTabDots(){
+  const dotsWrap = $('#tabDots');
+  if(!dotsWrap) return;
+  const buttons = $all('nav.tabs button');
+  dotsWrap.innerHTML = buttons.map(b =>
+    `<button data-tab="${b.dataset.tab}" class="${b.classList.contains('active') ? 'active' : ''}" aria-label="${b.textContent}"></button>`
+  ).join('');
+  $all('.tab-dots button').forEach(dot => {
+    dot.addEventListener('click', () => {
+      const targetBtn = $all('nav.tabs button').find(b => b.dataset.tab === dot.dataset.tab);
+      if(targetBtn){
+        $all('nav.tabs button').forEach(b => b.classList.remove('active'));
+        targetBtn.classList.add('active');
+        switchToTab(dot.dataset.tab);
+      }
+    });
+  });
+}
+function updateActiveDot(tabName){
+  $all('.tab-dots button').forEach(d => d.classList.toggle('active', d.dataset.tab === tabName));
+}
+function applyHideTabsPref(){
+  const hide = getHideTabsPref();
+  const bookEl = $('.book');
+  if(bookEl) bookEl.classList.toggle('tabs-hidden', hide);
+  const toggle = $('#hideTabsToggle');
+  if(toggle) toggle.checked = hide;
+  buildTabDots();
+}
+$('#hideTabsToggle').addEventListener('change', (e) => {
+  setHideTabsPref(e.target.checked);
+  $('.book').classList.toggle('tabs-hidden', e.target.checked);
+});
+applyHideTabsPref();
 
 /* ---------------- Swipe to turn pages (mobile) ---------------- */
 function goToAdjacentTab(direction){ // -1 = previous, 1 = next
