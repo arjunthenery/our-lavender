@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Our Lavender">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Chilanka&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FBF6FA;
@@ -427,6 +427,50 @@
     display:flex; align-items:center; gap:8px;
   }
   .heading-sprig{ width:11px; height:auto; max-height:33px; flex-shrink:0; }
+
+  /* Veenchi's Space — notebook-page look, matching the reference PDF */
+  #veenchiList{ display:flex; flex-direction:column; gap:16px; margin-top:16px; }
+  .veenchi-entry{
+    position:relative;
+    background:
+      repeating-linear-gradient(180deg, transparent 0px, transparent 26px, rgba(120,155,220,0.32) 27px),
+      #fffdf9;
+    border-radius:8px;
+    padding:16px 16px 16px 34px;
+    box-shadow:var(--shadow);
+  }
+  .veenchi-entry::before{
+    content:"";
+    position:absolute; left:22px; top:0; bottom:0; width:1.5px;
+    background:rgba(224,120,120,0.45);
+  }
+  .veenchi-entry .veenchi-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px;
+  }
+  .veenchi-entry .veenchi-date{
+    font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:0.68rem;
+    color:var(--plum-2); letter-spacing:0.03em; white-space:nowrap;
+  }
+  .veenchi-entry .veenchi-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .veenchi-entry .veenchi-actions button{
+    width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,0.7); font-size:0.72rem;
+  }
+  .veenchi-entry .veenchi-actions .edit{ color:var(--plum-2); }
+  .veenchi-entry .veenchi-actions .del{ color:var(--rose); }
+  .veenchi-entry .veenchi-text{
+    font-family:'Caveat',cursive; font-size:1.35rem; line-height:1.5; color:var(--ink);
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .veenchi-text .veenchi-mal{
+    font-family:'Chilanka',cursive; font-style:italic; font-size:0.74em;
+  }
+  .veenchi-entry .veenchi-img{
+    display:block; max-width:220px; width:100%; margin-top:12px;
+    border-radius:2px; box-shadow:0 4px 14px rgba(74,49,120,0.22);
+    transform:rotate(-1.5deg);
+  }
+  .veenchi-empty{ text-align:center; color:var(--plum-2); font-size:0.9rem; margin-top:20px; }
   textarea, input[type=text], input[type=date], input[type=time]{
     font-family:'Nunito Sans',sans-serif;
     border:1.5px solid var(--line);
@@ -707,7 +751,7 @@
       <button class="btn" id="signInBtn">Sign in with Google</button>
 
       <div id="configNotice"></div>
-      <div class="copyright-cover">© 2026 Arjun Thenery Maniknatan</div>
+      <div class="copyright-cover">© 2026 Arjun Thenery Manikantan</div>
     </div>
   </div>
 </div>
@@ -719,6 +763,8 @@
     <button data-tab="feed" class="active">Feed</button>
     <button data-tab="plans">Plans</button>
     <button data-tab="countdown">Countdown</button>
+    <button data-tab="ente">Ente Lavender</button>
+    <button data-tab="veenchi">Veenchi's Space</button>
     <button data-tab="settings">Settings</button>
   </nav>
 
@@ -813,6 +859,52 @@
     </div>
   </section>
 
+  <!-- ENTE LAVENDER -->
+  <section class="panel" id="panel-ente">
+    <div class="panel-content" style="display:flex; flex-direction:column;">
+    <div class="card" id="entePdfCard" style="display:flex; flex-direction:column; flex:1; min-height:0;">
+      <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Ente Lavender</h2>
+
+      <div id="entePdfEmpty">
+        <p style="font-size:0.85rem; color:var(--plum-2); margin:0;">
+          Nothing uploaded yet — add a PDF from Settings.
+        </p>
+      </div>
+
+      <div id="entePdfViewerWrap" style="display:none; flex:1; min-height:0; flex-direction:column;">
+        <p id="entePdfCaption" style="font-family:'Cormorant Garamond',serif; font-weight:600; font-style:italic; font-size:1.15rem; color:var(--rose); margin:0 0 10px; flex-shrink:0;">A space where I capture my thoughts about you...</p>
+        <div id="entePdfFrameWrap" style="position:relative; width:100%; flex:1; min-height:280px; border-radius:10px; overflow:hidden; background:var(--paper-2);">
+          <iframe id="entePdfFrame" style="width:100%; height:100%; border:none;" title="Ente Lavender PDF"></iframe>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- VEENCHI'S SPACE -->
+  <section class="panel" id="panel-veenchi">
+    <div class="panel-content">
+    <div class="card composer">
+      <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Veenchi's Space</h2>
+      <textarea id="veenchiText" placeholder="Write whatever's on your mind..." style="min-height:100px;"></textarea>
+      <div class="actions" style="margin-top:2px;">
+        <label class="btn small ghost attach-photo-btn" for="veenchiImage">Attach Photo</label>
+        <input type="file" id="veenchiImage" accept="image/*" class="visually-hidden">
+        <div style="display:flex; gap:8px;">
+          <button class="btn small ghost" id="cancelVeenchiEditBtn" style="display:none;">Cancel</button>
+          <button class="btn small" id="addVeenchiBtn">Add thought</button>
+        </div>
+      </div>
+      <div id="veenchiImgPreviewWrap" style="display:none; margin-top:10px; align-items:center; gap:10px;">
+        <img id="veenchiImgPreview" alt="" style="width:60px; height:60px; object-fit:cover; border-radius:8px; box-shadow:var(--shadow);">
+        <button type="button" class="btn ghost small" id="veenchiRecropBtn">Recrop</button>
+        <button type="button" class="btn ghost small" id="veenchiRemoveImgBtn">Remove photo</button>
+      </div>
+    </div>
+    <div id="veenchiList"></div>
+    </div>
+  </section>
+
   <!-- SETTINGS -->
   <section class="panel" id="panel-settings">
     <div class="panel-content">
@@ -840,6 +932,25 @@
         Data lives as one JSON file inside your shared Google Drive folder, so both of you always see the same thing.
         Nobody else can read it unless you share the folder further.
       </p>
+    </div>
+
+    <div class="card settings-grid">
+      <h2 class="section-title">Ente Lavender PDF</h2>
+      <p style="font-size:0.78rem;color:var(--plum-2); margin:0;">Same PDF as the Ente Lavender tab — upload, replace, or remove it from here too.</p>
+      <div id="settingsEntePdfEmpty">
+        <label class="btn small ghost attach-photo-btn" for="settingsEntePdfInput">Upload PDF</label>
+        <input type="file" id="settingsEntePdfInput" accept="application/pdf" class="visually-hidden">
+      </div>
+      <div id="settingsEntePdfFilled" style="display:none;">
+        <div class="actions" style="justify-content:space-between;">
+          <span id="settingsEntePdfName" style="font-size:0.8rem;color:var(--plum-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+          <div style="display:flex; gap:8px; flex-shrink:0;">
+            <label class="btn ghost small attach-photo-btn" for="settingsEntePdfInputChange">Change</label>
+            <input type="file" id="settingsEntePdfInputChange" accept="application/pdf" class="visually-hidden">
+            <button class="btn ghost small" id="settingsRemoveEntePdfBtn">Remove</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     </div>
@@ -876,6 +987,7 @@ const CONFIG = {
   CLIENT_ID: "230896704561-2ofe6r70rv6nkgcv5lai539a9oqfj8qa.apps.googleusercontent.com",
   FOLDER_ID: "1YoF8uGf3wRpvW4ml1T7tn2NMcBxAMe--",
   FILE_NAME: "ourspace-data.json",
+  PDF_FILE_NAME: "ente-lavender.pdf",
   SCOPE: "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
   // While true: "Sign in with Google" skips real Google auth entirely and
   // drops you straight into the app, saving data to this browser only
@@ -1012,7 +1124,7 @@ function afterSignInMock(){
     data = raw ? JSON.parse(raw) : blankData();
   }catch(e){ data = blankData(); }
   data.posts ||= []; data.plans ||= [];
-  data.countdowns ||= [];
+  data.countdowns ||= []; data.entePdf = data.entePdf || null; data.veenchiThoughts ||= [];
   if(data.countdown && data.countdown.date){
     data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
     delete data.countdown;
@@ -1040,7 +1152,8 @@ async function driveFindFile(){
 function blankData(){
   return {
     spaceName: "Our Lavender",
-    posts: [], plans: [], countdowns: []
+    posts: [], plans: [], countdowns: [],
+    entePdf: null, veenchiThoughts: []
   };
 }
 
@@ -1083,6 +1196,63 @@ async function driveSaveContent(id, obj){
   if(!res.ok) throw new Error('drive save failed');
 }
 
+/* ---------------- Ente Lavender PDF (its own file in Drive, not embedded in the JSON) ---------------- */
+async function driveFindPdfFile(){
+  const q = encodeURIComponent(`'${CONFIG.FOLDER_ID}' in parents and name='${CONFIG.PDF_FILE_NAME}' and trashed=false`);
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`, {
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  const json = await res.json();
+  if(json.files && json.files.length) return json.files[0].id;
+  return null;
+}
+
+async function driveCreatePdfFile(fileBlob){
+  const boundary = "-------ourlavenderpdf" + Date.now();
+  const metadata = { name: CONFIG.PDF_FILE_NAME, parents: [CONFIG.FOLDER_ID], mimeType: "application/pdf" };
+  const metaPart = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n`;
+  const openPart = `--${boundary}\r\nContent-Type: application/pdf\r\n\r\n`;
+  const closePart = `\r\n--${boundary}--`;
+  const body = new Blob([metaPart, openPart, fileBlob, closePart]);
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+    method: 'POST',
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
+      'Content-Type': `multipart/related; boundary=${boundary}`
+    },
+    body
+  });
+  if(!res.ok) throw new Error('pdf upload failed');
+  const json = await res.json();
+  return json.id;
+}
+
+async function drivePdfReplace(fileId, fileBlob){
+  const res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+    method: 'PATCH',
+    headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/pdf' },
+    body: fileBlob
+  });
+  if(!res.ok) throw new Error('pdf replace failed');
+}
+
+async function driveFetchPdfBlobUrl(fileId){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  if(!res.ok) throw new Error('pdf fetch failed');
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+async function driveDeletePdfFile(fileId){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
+    method: 'DELETE',
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  if(!res.ok && res.status !== 404) throw new Error('pdf delete failed');
+}
+
 async function loadData(){
   fileId = await driveFindFile();
   if(!fileId){
@@ -1093,7 +1263,7 @@ async function loadData(){
     catch(e){ data = blankData(); }
     if(!data || typeof data !== 'object'){ data = blankData(); }
     data.posts ||= []; data.plans ||= [];
-    data.countdowns ||= [];
+    data.countdowns ||= []; data.entePdf = data.entePdf || null; data.veenchiThoughts ||= [];
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1168,7 +1338,7 @@ async function refreshFromDrive(){
   try{
     data = await driveGetContent(fileId);
     data.posts ||= []; data.plans ||= [];
-    data.countdowns ||= [];
+    data.countdowns ||= []; data.entePdf = data.entePdf || null; data.veenchiThoughts ||= [];
     if(data.countdown && data.countdown.date){
       data.countdowns.push({ id: uid(), label: data.countdown.label || 'Special day', date: data.countdown.date });
       delete data.countdown;
@@ -1216,6 +1386,8 @@ function switchToTab(tabName){
     };
     newPanel.addEventListener('animationend', cleanupNew);
   }
+
+  if(tabName === 'ente'){ renderEnte(); loadEnteViewerIfNeeded(); }
 
   updateActiveDot(tabName);
 }
@@ -1540,6 +1712,43 @@ $('#recropBtn').addEventListener('click', async () => {
   }
 });
 
+/* Veenchi's Space photo attach — same crop/compress pipeline as Feed */
+let pendingVeenchiImg = null;
+let lastRawVeenchiImageDataUrl = null;
+
+$('#veenchiImage').addEventListener('change', async () => {
+  const file = $('#veenchiImage').files[0];
+  if(!file) return;
+  const rawDataUrl = await fileToDataUrl(file);
+  lastRawVeenchiImageDataUrl = rawDataUrl;
+  const cropped = await openCropModal(rawDataUrl);
+  if(cropped){
+    pendingVeenchiImg = cropped;
+    $('#veenchiImgPreview').src = cropped;
+    $('#veenchiImgPreviewWrap').style.display = 'flex';
+  } else {
+    $('#veenchiImage').value = '';
+    pendingVeenchiImg = null;
+    $('#veenchiImgPreviewWrap').style.display = 'none';
+  }
+});
+
+$('#veenchiRecropBtn').addEventListener('click', async () => {
+  if(!lastRawVeenchiImageDataUrl) return;
+  const cropped = await openCropModal(lastRawVeenchiImageDataUrl);
+  if(cropped){
+    pendingVeenchiImg = cropped;
+    $('#veenchiImgPreview').src = cropped;
+  }
+});
+
+$('#veenchiRemoveImgBtn').addEventListener('click', () => {
+  pendingVeenchiImg = null;
+  lastRawVeenchiImageDataUrl = null;
+  $('#veenchiImage').value = '';
+  $('#veenchiImgPreviewWrap').style.display = 'none';
+});
+
 $('#addPostBtn').addEventListener('click', async () => {
   const btn = $('#addPostBtn');
   const wasEditing = editingPostId;
@@ -1825,12 +2034,225 @@ $('#footerRefreshBtn').addEventListener('click', async () => {
   }
 });
 
+/* ---------------- Ente Lavender (shared PDF) ---------------- */
+let loadedEntePdfFileId = null; // avoids re-fetching the blob every time the tab is opened
+let currentEntePdfBlobUrl = null;
+
+function renderEnte(){
+  const emptyEl = $('#entePdfEmpty');
+  const viewerEl = $('#entePdfViewerWrap');
+  const settingsEmptyEl = $('#settingsEntePdfEmpty');
+  const settingsFilledEl = $('#settingsEntePdfFilled');
+  if(!emptyEl || !viewerEl) return;
+
+  if(!data.entePdf){
+    emptyEl.style.display = 'block';
+    viewerEl.style.display = 'none';
+    if(settingsEmptyEl) settingsEmptyEl.style.display = 'block';
+    if(settingsFilledEl) settingsFilledEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  viewerEl.style.display = 'flex';
+  if(settingsEmptyEl) settingsEmptyEl.style.display = 'none';
+  if(settingsFilledEl) settingsFilledEl.style.display = 'block';
+  if($('#settingsEntePdfName')){
+    $('#settingsEntePdfName').textContent = data.entePdf.name || 'ente-lavender.pdf';
+    $('#settingsEntePdfName').title = data.entePdf.name || '';
+  }
+  // Note: this only shows/hides the right UI state. The actual PDF content is
+  // fetched lazily by loadEnteViewerIfNeeded(), only when the tab is opened —
+  // so a large PDF never slows down sign-in or other tabs.
+}
+
+function loadEnteViewerIfNeeded(){
+  if(!data.entePdf) return;
+  if(CONFIG.MOCK_MODE){
+    if(data.entePdf.dataUrl) $('#entePdfFrame').src = data.entePdf.dataUrl;
+    return;
+  }
+  if(!data.entePdf.fileId) return;
+  if(loadedEntePdfFileId === data.entePdf.fileId) return; // already showing the current one
+  loadEntePdfBlob(data.entePdf.fileId);
+}
+
+async function loadEntePdfBlob(fileId){
+  try{
+    const url = await driveFetchPdfBlobUrl(fileId);
+    if(currentEntePdfBlobUrl) URL.revokeObjectURL(currentEntePdfBlobUrl);
+    currentEntePdfBlobUrl = url;
+    loadedEntePdfFileId = fileId;
+    $('#entePdfFrame').src = url;
+  }catch(e){
+    console.error(e);
+    alert("Couldn't load the PDF from Drive: " + e.message);
+  }
+}
+
+async function handleEntePdfUpload(file){
+  if(!file) return;
+  if(file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')){
+    alert("That doesn't look like a PDF. Please choose a .pdf file.");
+    return;
+  }
+  const label = data.entePdf ? 'Replacing PDF...' : 'Uploading PDF...';
+  setSync('busy', label);
+  try{
+    if(CONFIG.MOCK_MODE){
+      const dataUrl = await fileToDataUrl(file);
+      data.entePdf = { name: file.name, dataUrl, ts: Date.now() };
+      renderEnte();
+      loadEnteViewerIfNeeded();
+      await persistNow();
+      setSync('ok', 'Saved on this device');
+      return;
+    }
+    let fileId = data.entePdf && data.entePdf.fileId;
+    if(!fileId){
+      fileId = await driveFindPdfFile(); // in case one already exists in the folder from before
+    }
+    if(fileId){
+      await drivePdfReplace(fileId, file);
+    } else {
+      fileId = await driveCreatePdfFile(file);
+    }
+    data.entePdf = { fileId, name: file.name, ts: Date.now() };
+    loadedEntePdfFileId = null; // force a fresh fetch since content changed
+    renderEnte();
+    loadEnteViewerIfNeeded();
+    await persistNow();
+    setSync('ok', 'Synced');
+  }catch(e){
+    console.error(e);
+    setSync('err', 'Save failed');
+    alert("Couldn't upload that PDF: " + e.message);
+  }
+}
+
+$('#settingsEntePdfInput').addEventListener('change', () => {
+  handleEntePdfUpload($('#settingsEntePdfInput').files[0]);
+  $('#settingsEntePdfInput').value = '';
+});
+$('#settingsEntePdfInputChange').addEventListener('change', () => {
+  handleEntePdfUpload($('#settingsEntePdfInputChange').files[0]);
+  $('#settingsEntePdfInputChange').value = '';
+});
+
+async function removeEntePdf(){
+  if(!data.entePdf) return;
+  if(!confirm("Remove this PDF? This can't be undone.")) return;
+  const oldFileId = data.entePdf.fileId;
+  data.entePdf = null;
+  loadedEntePdfFileId = null;
+  renderEnte();
+  try{
+    if(!CONFIG.MOCK_MODE && oldFileId){
+      await driveDeletePdfFile(oldFileId);
+    }
+    await persistNow();
+  }catch(e){
+    console.error(e);
+    alert("Removed here, but couldn't delete it from Drive: " + e.message);
+  }
+}
+$('#settingsRemoveEntePdfBtn').addEventListener('click', removeEntePdf);
+
+/* ---------------- Veenchi's Space ---------------- */
+let editingVeenchiId = null;
+
+$('#addVeenchiBtn').addEventListener('click', () => {
+  const text = $('#veenchiText').value.trim();
+  if(!text && !pendingVeenchiImg) return;
+  if(editingVeenchiId){
+    const entry = data.veenchiThoughts.find(x => x.id === editingVeenchiId);
+    // Only the text/photo change on edit — createdAt is intentionally left untouched,
+    // so the original date/time stamp never moves just because it was edited.
+    if(entry){ entry.text = text; entry.img = pendingVeenchiImg; }
+    cancelVeenchiEdit();
+  } else {
+    data.veenchiThoughts.unshift({
+      id: uid(), text, img: pendingVeenchiImg,
+      author: me.name, authorEmail: me.email, createdAt: Date.now()
+    });
+    $('#veenchiText').value = '';
+    $('#veenchiImage').value = '';
+    pendingVeenchiImg = null;
+    lastRawVeenchiImageDataUrl = null;
+    $('#veenchiImgPreviewWrap').style.display = 'none';
+  }
+  renderVeenchi();
+  persist();
+});
+
+function startVeenchiEdit(entry){
+  editingVeenchiId = entry.id;
+  $('#veenchiText').value = entry.text;
+  $('#addVeenchiBtn').textContent = 'Save changes';
+  $('#cancelVeenchiEditBtn').style.display = 'inline-block';
+  if(entry.img){
+    pendingVeenchiImg = entry.img;
+    lastRawVeenchiImageDataUrl = entry.img;
+    $('#veenchiImgPreview').src = entry.img;
+    $('#veenchiImgPreviewWrap').style.display = 'flex';
+  } else {
+    pendingVeenchiImg = null;
+    lastRawVeenchiImageDataUrl = null;
+    $('#veenchiImgPreviewWrap').style.display = 'none';
+  }
+  $('#veenchiText').scrollIntoView({ behavior:'smooth', block:'center' });
+  $('#veenchiText').focus();
+}
+function cancelVeenchiEdit(){
+  editingVeenchiId = null;
+  $('#veenchiText').value = '';
+  $('#veenchiImage').value = '';
+  pendingVeenchiImg = null;
+  lastRawVeenchiImageDataUrl = null;
+  $('#veenchiImgPreviewWrap').style.display = 'none';
+  $('#addVeenchiBtn').textContent = 'Add thought';
+  $('#cancelVeenchiEditBtn').style.display = 'none';
+}
+$('#cancelVeenchiEditBtn').addEventListener('click', cancelVeenchiEdit);
+
+function renderVeenchi(){
+  const list = $('#veenchiList');
+  if(!list) return;
+  list.innerHTML = '';
+  if(!data.veenchiThoughts.length){
+    list.innerHTML = '<div class="veenchi-empty">Nothing written yet.</div>';
+    return;
+  }
+  data.veenchiThoughts.forEach(entry => {
+    const el = document.createElement('div');
+    el.className = 'veenchi-entry';
+    el.innerHTML = `
+      <div class="veenchi-top">
+        <div class="veenchi-date">${fmtVeenchiDate(entry.createdAt)}</div>
+        <div class="veenchi-actions">
+          <button class="edit" data-id="${entry.id}" aria-label="Edit">✎</button>
+          <button class="del" data-id="${entry.id}" aria-label="Remove">✕</button>
+        </div>
+      </div>
+      <div class="veenchi-text">${formatMixedScript(entry.text)}</div>
+      ${entry.img ? `<img class="veenchi-img" src="${entry.img}" alt="">` : ''}
+    `;
+    el.querySelector('.del').addEventListener('click', () => {
+      if(!confirm("Remove this thought? This can't be undone.")) return;
+      data.veenchiThoughts = data.veenchiThoughts.filter(x => x.id !== entry.id);
+      if(editingVeenchiId === entry.id) cancelVeenchiEdit();
+      renderVeenchi(); persist();
+    });
+    el.querySelector('.edit').addEventListener('click', () => startVeenchiEdit(entry));
+    list.appendChild(el);
+  });
+}
+
 /* ---------------- Render all + helpers ---------------- */
 function renderAll(){
   $('#spaceName').value = data.spaceName || 'Our Lavender';
   $('#brandTitle').textContent = data.spaceName || 'Our Lavender';
   document.title = data.spaceName || 'Our Lavender';
-  renderFeed(); renderPlans(); renderCountdown();
+  renderFeed(); renderPlans(); renderCountdown(); renderEnte(); renderVeenchi();
 }
 
 function fmtDate(ts){
@@ -1842,8 +2264,22 @@ function fmtTime(ts){
   if(!ts) return '';
   return new Date(ts).toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
 }
+function fmtVeenchiDate(ts){
+  if(!ts) return '';
+  const d = new Date(ts);
+  return `${d.getDate()} | ${d.getMonth()+1} | ${d.getFullYear()}  ·  ${d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}`;
+}
 function escapeHtml(s){
   return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+// Wraps runs of Malayalam script in their own span so they can get a
+// different font/size/italic — Caveat has no Malayalam glyphs at all, so
+// mixed English+Malayalam text needs separate styling per script to look
+// visually matched rather than relying on browser's silent font fallback.
+function formatMixedScript(rawText){
+  const escaped = escapeHtml(rawText);
+  return escaped.replace(/[\u0D00-\u0D7F]+/g, (run) => `<span class="veenchi-mal">${run}</span>`);
 }
 
 /* light auto-refresh so you both stay roughly in sync while both apps are open */
