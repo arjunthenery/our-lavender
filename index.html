@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Our Lavender">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@500;600;700&family=Chilanka&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@400;500;600;700&family=Chilanka&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FBF6FA;
@@ -459,11 +459,11 @@
   .veenchi-entry .veenchi-actions .edit{ color:var(--plum-2); }
   .veenchi-entry .veenchi-actions .del{ color:var(--rose); }
   .veenchi-entry .veenchi-text{
-    font-family:'Caveat',cursive; font-size:1.35rem; line-height:1.5; color:var(--ink);
+    font-family:'Caveat',cursive; font-weight:400; font-size:1.35rem; line-height:1.5; color:var(--ink);
     white-space:pre-wrap; word-break:break-word;
   }
   .veenchi-text .veenchi-mal{
-    font-family:'Chilanka',cursive; font-style:italic; font-size:0.74em;
+    font-family:'Chilanka',cursive; font-weight:400; font-style:italic; font-size:0.74em;
   }
   .veenchi-entry .veenchi-img{
     display:block; max-width:220px; width:100%; margin-top:12px;
@@ -951,6 +951,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="card settings-grid">
+      <h2 class="section-title">Dedication</h2>
+      <p style="font-size:0.78rem;color:var(--plum-2); margin:0;">എന്റെ ലാവെൻഡർ വീണേച്ചിക്ക് വേണ്ടി 💜</p>
     </div>
 
     </div>
@@ -2037,6 +2042,36 @@ $('#footerRefreshBtn').addEventListener('click', async () => {
 /* ---------------- Ente Lavender (shared PDF) ---------------- */
 let loadedEntePdfFileId = null; // avoids re-fetching + re-rendering when reopening the same tab
 
+// Local PDF cache — keyed by fileId+uploadedAt, so it only ever changes when a
+// genuinely new PDF is uploaded. Lets the PDF open instantly on repeat visits
+// instead of re-downloading it from Drive every single time.
+const ENTE_PDF_CACHE_NAME = 'ourlavender-ente-pdf-v1';
+function entePdfCacheKey(fileId, ts){
+  return `https://ourlavender.local/ente-pdf/${fileId}-${ts}`;
+}
+async function cacheEntePdfBlob(key, blob){
+  try{
+    if(!('caches' in window)) return;
+    const cache = await caches.open(ENTE_PDF_CACHE_NAME);
+    await cache.put(key, new Response(blob));
+  }catch(e){ console.warn('Could not cache PDF locally', e); }
+}
+async function getCachedEntePdfArrayBuffer(key){
+  try{
+    if(!('caches' in window)) return null;
+    const cache = await caches.open(ENTE_PDF_CACHE_NAME);
+    const res = await cache.match(key);
+    if(!res) return null;
+    return await res.arrayBuffer();
+  }catch(e){ return null; }
+}
+async function clearOldEntePdfCache(){
+  try{
+    if(!('caches' in window)) return;
+    await caches.delete(ENTE_PDF_CACHE_NAME); // wipe anything stale before caching the new one
+  }catch(e){}
+}
+
 function renderEnte(){
   const emptyEl = $('#entePdfEmpty');
   const viewerEl = $('#entePdfViewerWrap');
@@ -2072,22 +2107,33 @@ async function renderPdfPages(source){
   const container = $('#entePdfPages');
   if(!container || !window.pdfjsLib) return;
   container.innerHTML = '<p style="text-align:center;color:var(--plum-2);font-size:0.85rem;">Loading PDF...</p>';
+  // Guard against ever handing PDF.js an empty buffer (from a corrupted cache
+  // entry, a broken Drive file, etc.) — fail with a clear, actionable message
+  // instead of PDF.js's cryptic internal "file is empty" error.
+  if(source && source.data && source.data.byteLength === 0){
+    container.innerHTML = '<p style="text-align:center;color:var(--rose);font-size:0.85rem;">That PDF came back empty. Try uploading it again from Settings.</p>';
+    return;
+  }
   try{
     const pdf = await pdfjsLib.getDocument(source).promise;
     container.innerHTML = '';
     const containerWidth = container.clientWidth || 300;
+    // Render at the screen's real pixel density (2x/3x on most phones), not just
+    // the CSS width — otherwise the canvas bitmap has fewer pixels than the
+    // screen can show and everything looks softer than the source PDF actually is.
+    const dpr = window.devicePixelRatio || 1;
     for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++){
       const page = await pdf.getPage(pageNum);
       const unscaled = page.getViewport({ scale: 1 });
-      const scale = containerWidth / unscaled.width;
-      const viewport = page.getViewport({ scale });
+      const cssScale = containerWidth / unscaled.width;
+      const viewport = page.getViewport({ scale: cssScale * dpr });
       const canvas = document.createElement('canvas');
       canvas.style.display = 'block';
       canvas.style.width = '100%';
       canvas.style.marginBottom = '12px';
       canvas.style.borderRadius = '6px';
       canvas.style.boxShadow = 'var(--shadow)';
-      canvas.width = viewport.width;
+      canvas.width = viewport.width;   // actual bitmap pixels — full device resolution
       canvas.height = viewport.height;
       await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
       container.appendChild(canvas);
@@ -2110,9 +2156,27 @@ function loadEnteViewerIfNeeded(){
 }
 
 async function loadEntePdfBlob(fileId){
+  const cacheKey = entePdfCacheKey(fileId, data.entePdf.ts);
   try{
+    const cachedBuf = await getCachedEntePdfArrayBuffer(cacheKey);
+    if(cachedBuf && cachedBuf.byteLength > 0){
+      loadedEntePdfFileId = fileId;
+      await renderPdfPages({ data: cachedBuf });
+      return; // loaded instantly from the local cache — no Drive request needed
+    }
+    if(cachedBuf){
+      await clearOldEntePdfCache(); // cached entry existed but was empty/corrupt — discard it
+    }
     const arrayBuffer = await driveFetchPdfArrayBuffer(fileId);
+    if(arrayBuffer.byteLength === 0){
+      alert("The PDF stored in Drive appears to be empty. Try uploading it again from Settings.");
+      return;
+    }
     loadedEntePdfFileId = fileId;
+    // Build the cached copy BEFORE handing the buffer to PDF.js — PDF.js transfers
+    // (detaches) the ArrayBuffer to its worker thread for performance, which leaves
+    // the original buffer empty afterward. Caching first avoids storing a zero-byte file.
+    cacheEntePdfBlob(cacheKey, new Blob([arrayBuffer], { type: 'application/pdf' }));
     await renderPdfPages({ data: arrayBuffer });
   }catch(e){
     console.error(e);
@@ -2147,10 +2211,12 @@ async function handleEntePdfUpload(file){
     } else {
       fileId = await driveCreatePdfFile(file);
     }
+    await clearOldEntePdfCache(); // the old cached copy no longer matches what's in Drive
     data.entePdf = { fileId, name: file.name, ts: Date.now() };
-    loadedEntePdfFileId = null; // force a fresh fetch since content changed
+    loadedEntePdfFileId = fileId;
+    cacheEntePdfBlob(entePdfCacheKey(fileId, data.entePdf.ts), file); // cache it now — we already have it, no need to re-download
     renderEnte();
-    loadEnteViewerIfNeeded();
+    await renderPdfPages({ data: await file.arrayBuffer() }); // show it immediately from the local file
     await persistNow();
     setSync('ok', 'Synced');
   }catch(e){
