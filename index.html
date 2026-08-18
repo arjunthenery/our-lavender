@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Our Lavender">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@400;500;600;700&family=Chilanka&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500;1,600;1,700&family=Nunito+Sans:wght@400;500;600;700;800&family=Caveat:wght@400;500;600;700&family=Chilanka&family=Gayathri:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FBF6FA;
@@ -65,6 +65,27 @@
     text-align:center;
     padding:10px;
     box-sizing:border-box;
+    position:relative;
+  }
+  .birthday-petals{
+    position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:5;
+  }
+  .birthday-petals .petal{
+    position:absolute; top:0; left:50%;
+    border-radius:60% 0 60% 0;
+    opacity:0;
+    animation-name:petalCascade;
+    animation-timing-function:ease-in;
+    animation-iteration-count:infinite;
+  }
+  @keyframes petalCascade{
+    0%{ transform:translate(-50%,0) translate(0,0) rotate(0deg); opacity:0; }
+    10%{ opacity:0.9; }
+    85%{ opacity:0.7; }
+    100%{ transform:translate(-50%,0) translate(var(--dx,0px), var(--dy,110vh)) rotate(360deg); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .birthday-petals .petal{ animation:none; display:none; }
   }
   .copyright-cover{
     position:absolute; left:0; right:0; bottom:8px;
@@ -141,6 +162,26 @@
     margin:0 0 18px;
     color:var(--gold);
     text-shadow:0 1px 0 rgba(0,0,0,0.2);
+  }
+  #birthdayBanner{
+    font-family:'Gayathri', sans-serif;
+    font-weight:700;
+    font-style:normal;
+    font-size:clamp(1.3rem, 6vw, 2.2rem);
+    line-height:1.4;
+    color:var(--gold);
+    margin:0 0 18px;
+    padding:0;
+    text-align:center;
+    position:relative; z-index:1;
+    animation:birthdayPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes birthdayPulse{
+    0%, 100%{ transform:scale(1); }
+    50%{ transform:scale(1.045); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #birthdayBanner{ animation:none; }
   }
   .book-cover p{
     max-width:360px;
@@ -526,6 +567,29 @@
   .post img{ width:100%; display:block; border-radius:1px; margin-bottom:10px; background:var(--paper-2); }
   .post .cap{ font-family:'Caveat',cursive; font-size:1.25rem; color:var(--ink); line-height:1.3; }
   .post .meta{ font-size:0.72rem; color:var(--plum-2); margin-top:8px; display:flex; justify-content:space-between; }
+  .item-meta{ font-size:0.72rem; color:var(--plum-2); margin-top:6px; }
+  .reaction-corner-badge{
+    position:absolute; bottom:-8px; right:14px; z-index:3;
+    display:flex; gap:2px; background:#fff; border-radius:999px;
+    padding:2px 6px; box-shadow:var(--shadow); font-size:0.85rem;
+    pointer-events:none;
+  }
+  .reaction-badge{ line-height:1.4; }
+  .reaction-picker{
+    position:absolute; bottom:8px; right:8px;
+    z-index:10;
+    display:flex; align-items:center; gap:4px; background:#fff; border-radius:999px;
+    padding:6px 10px; box-shadow:var(--shadow);
+  }
+  .reaction-custom-input{
+    width:50px; border:none; outline:none; font-size:1.05rem;
+    text-align:center; background:var(--paper-2); border-radius:999px; padding:3px 4px;
+  }
+  .reaction-option{
+    border:none; background:none; font-size:1.3rem; cursor:pointer;
+    padding:2px; border-radius:50%; transition:transform .1s ease;
+  }
+  .reaction-option:hover{ transform:scale(1.3); }
 
 
   /* Plans */
@@ -574,6 +638,12 @@
     color:var(--plum-2); font-size:0.9rem;
   }
   .countdown-empty{ text-align:center; color:var(--plum-2); font-size:0.9rem; margin-top:20px; }
+  .subsection-title{
+    font-family:'Cormorant Garamond',serif; font-weight:600; font-style:normal;
+    font-size:1.05rem; color:var(--plum-2); opacity:0.85;
+    margin:22px 0 10px; padding-top:14px;
+    border-top:1px solid var(--paper-2);
+  }
 
   /* Settings */
   .settings-grid{ display:flex; flex-direction:column; gap:14px; }
@@ -743,6 +813,7 @@
   <div class="book-cover">
     <div class="ribbon"></div>
     <div class="book-cover-inner">
+      <div id="birthdayBanner" style="display:none;">എന്റെ വീണേച്ചിക്ക് 🦋<br>ഒരായിരം ജന്മദിനാശംസകൾ</div>
       <div style="display:flex; flex-direction:column; align-items:center; gap:4px;">
         <svg class="gate-sprig-top" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>
         <h1>Our Lavender</h1>
@@ -819,7 +890,7 @@
         </div>
         <div>
           <label class="field-label">Title</label>
-          <input type="text" id="planTitle" placeholder="Movie night">
+          <input type="text" id="planTitle" placeholder="What's the plan?">
         </div>
       </div>
       <div style="margin-top:10px;">
@@ -842,12 +913,12 @@
       <h2 class="section-title"><svg class="heading-sprig" viewBox="0 0 70 210"><use href="#lavSprig" xlink:href="#lavSprig"></use></svg>Add an occasion</h2>
       <div class="row">
         <div>
-          <label class="field-label">Occasion</label>
-          <input type="text" id="cdLabel" placeholder="Our anniversary">
-        </div>
-        <div>
           <label class="field-label">Date</label>
           <input type="date" id="cdDate">
+        </div>
+        <div>
+          <label class="field-label">Occasion</label>
+          <input type="text" id="cdLabel" placeholder="What are we counting down to?">
         </div>
       </div>
       <div class="actions" style="margin-top:10px; justify-content:flex-end;">
@@ -872,7 +943,7 @@
       </div>
 
       <div id="entePdfViewerWrap" style="display:none; flex:1; min-height:0; flex-direction:column;">
-        <p id="entePdfCaption" style="font-family:'Cormorant Garamond',serif; font-weight:600; font-style:italic; font-size:1.15rem; color:var(--rose); margin:0 0 10px; flex-shrink:0;">A space where I capture my thoughts about you...</p>
+        <p id="entePdfCaption" style="font-family:'Cormorant Garamond',serif; font-weight:600; font-style:normal; font-size:0.9rem; color:var(--plum-2); margin:0 0 10px; flex-shrink:0;">A space where I capture my thoughts about you...</p>
         <div id="entePdfFrameWrap" style="position:relative; width:100%; flex:1; min-height:280px; border-radius:10px; overflow-y:auto; background:var(--paper-2); padding:10px;">
           <div id="entePdfPages"></div>
         </div>
@@ -1003,6 +1074,57 @@ const CONFIG = {
 };
 /* ============================================ */
 
+/* ---------------- Veenchi's birthday surprise (August 22, every year) ---------------- */
+function isVeenchiBirthday(){
+  // Add ?veenchi_bday=1 to the URL to preview this any day, for testing.
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('veenchi_bday') === '1') return true;
+  const d = new Date();
+  return d.getMonth() === 7 && d.getDate() === 22; // August is month index 7
+}
+
+function spawnBirthdayPetals(){
+  const gate = $('#gate');
+  if(!gate || $('#birthdayPetals')) return;
+  const wrap = document.createElement('div');
+  wrap.id = 'birthdayPetals';
+  wrap.className = 'birthday-petals';
+  const colors = ['#E6AECB', '#D69EC5', '#F1D0DF', '#C68CB6', '#B67AA9'];
+  const halfWidth = gate.clientWidth / 2 + 20;
+  const fallDistance = gate.clientHeight + 60;
+  const sourceBandPercent = 30; // width of the starting band across the top, as % of screen width
+  for(let i = 0; i < 40; i++){
+    const p = document.createElement('div');
+    p.className = 'petal';
+    const size = 8 + Math.random() * 6;
+    const duration = 5 + Math.random() * 5;
+    const delay = -Math.random() * duration; // negative delay = already mid-fall on load
+    // Starts somewhere across a wide band at the top (not one single point), then
+    // spreads further left/right as it falls to the bottom.
+    const startLeftPercent = 50 + (Math.random() * 2 - 1) * (sourceBandPercent / 2);
+    const dx = Math.round((Math.random() * 2 - 1) * halfWidth) + 'px';
+    const dy = fallDistance + 'px';
+    p.style.left = startLeftPercent + '%';
+    p.style.width = size + 'px';
+    p.style.height = (size * 1.4) + 'px';
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = delay + 's';
+    p.style.setProperty('--dx', dx);
+    p.style.setProperty('--dy', dy);
+    wrap.appendChild(p);
+  }
+  gate.appendChild(wrap);
+}
+
+function applyBirthdaySurpriseIfNeeded(){
+  if(!isVeenchiBirthday()) return;
+  if($('#birthdayPetals')) return; // already showing, don't double up
+  const banner = $('#birthdayBanner');
+  if(banner) banner.style.display = 'block';
+  spawnBirthdayPetals();
+}
+
 // The only two people who will ever sign into this app. Their name is
 // auto-detected from which Google account signs in — no need to ask.
 const KNOWN_PEOPLE = {
@@ -1019,6 +1141,7 @@ let saveTimer = null;
 
 const $ = (sel) => document.querySelector(sel);
 const $all = (sel) => Array.from(document.querySelectorAll(sel));
+
 
 function uid(){
   try{
@@ -1068,7 +1191,13 @@ function initGoogle(){
   tryInit();
 }
 
+let readyToOpenBook = false;
+
 $('#signInBtn').addEventListener('click', () => {
+  if(readyToOpenBook){
+    openBook();
+    return;
+  }
   if(CONFIG.MOCK_MODE){
     afterSignInMock();
     return;
@@ -1082,7 +1211,11 @@ $('#signInBtn').addEventListener('click', () => {
 });
 
 $('#signOutBtn').addEventListener('click', () => {
-  accessToken = null; me = null; data = null; fileId = null;
+  // "Close Book" just returns to the cover — it doesn't sign you out. Your
+  // session, data, and the "Open Book" button all stay exactly as they were,
+  // so opening it again goes straight back in with no new Google sign-in.
+  // The birthday banner/petals (if it's actually the day) are intentionally
+  // left as-is here too, so they're still there if you close and reopen.
   $('#app').classList.remove('shown');
   $('#gate').style.display = 'flex';
 });
@@ -1096,20 +1229,35 @@ function updateWhoBadge(){
 
 async function afterSignIn(){
   setSync('busy', 'Signing in...');
-  const uRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { Authorization: 'Bearer ' + accessToken }
-  });
-  me = await uRes.json();
-  if(me.email) me.email = me.email.trim().toLowerCase();
+  try{
+    const uRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+    if(!uRes.ok) throw new Error('Could not fetch your Google profile (status ' + uRes.status + ')');
+    me = await uRes.json();
+    if(me.email) me.email = me.email.trim().toLowerCase();
 
-  await loadData();
-  me.name = displayNameFor(me.email);
-  updateWhoBadge();
+    await loadData();
+    me.name = displayNameFor(me.email);
+    updateWhoBadge();
+    setSync('ok', 'Synced');
 
+    // Signed in, but stay on the cover — swap the button so opening the book
+    // itself is a deliberate second step, rather than jumping straight in.
+    readyToOpenBook = true;
+    $('#signInBtn').textContent = 'Open Book';
+    applyBirthdaySurpriseIfNeeded();
+  }catch(e){
+    console.error('Sign-in failed:', e);
+    setSync('err', 'Sign-in failed');
+    alert("Something went wrong finishing sign-in: " + e.message + "\n\nPlease try signing in again. If this keeps happening, check your internet connection or Drive permissions.");
+  }
+}
+
+function openBook(){
   $('#gate').style.display = 'none';
   $('#app').classList.add('shown');
   renderAll();
-  setSync('ok', 'Synced');
 }
 
 const MOCK_STORAGE_KEY = 'ourlavender-mock-data';
@@ -1136,11 +1284,11 @@ function afterSignInMock(){
     delete data.countdown;
   }
   data.spaceName ||= "Our Lavender";
-
-  $('#gate').style.display = 'none';
-  $('#app').classList.add('shown');
-  renderAll();
   setSync('ok', 'Saved on this device');
+
+  readyToOpenBook = true;
+  $('#signInBtn').textContent = 'Open Book';
+  applyBirthdaySurpriseIfNeeded();
 }
 
 /* ---------------- Drive I/O ---------------- */
@@ -1863,6 +2011,10 @@ $('#cancelPostEditBtn').addEventListener('click', cancelPostEdit);
 
 /* ---------------- Plans ---------------- */
 let editingPlanId = null;
+document.addEventListener('click', () => {
+  $all('.reaction-picker').forEach(pk => pk.style.display = 'none');
+});
+
 $('#addPlanBtn').addEventListener('click', () => {
   const date = $('#planDate').value;
   const title = $('#planTitle').value.trim();
@@ -1873,7 +2025,7 @@ $('#addPlanBtn').addEventListener('click', () => {
     if(plan){ plan.date = date; plan.title = title; plan.note = note; }
     cancelPlanEdit();
   } else {
-    data.plans.push({ id: uid(), date, title, note, addedBy: me.name });
+    data.plans.push({ id: uid(), date, title, note, author: me.name, authorEmail: me.email });
     $('#planDate').value=''; $('#planTitle').value=''; $('#planNote').value='';
   }
   renderPlans(); persist();
@@ -1899,16 +2051,41 @@ $('#cancelPlanEditBtn').addEventListener('click', cancelPlanEdit);
 function renderPlans(){
   const list = $('#plansList');
   list.innerHTML = '';
-  const sorted = [...data.plans].sort((a,b) => a.date.localeCompare(b.date));
-  sorted.forEach(p => {
+
+  const todayStr = (() => {
+    const t = new Date();
+    return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  })();
+
+  const upcoming = data.plans.filter(p => p.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date));
+  // Most recently happened first, when looking back.
+  const past = data.plans.filter(p => p.date < todayStr).sort((a,b) => b.date.localeCompare(a.date));
+
+  const REACTION_EMOJIS = ['❤️', '🥰', '🤗', '😊'];
+
+  function buildCard(p){
     const d = new Date(p.date + 'T00:00:00');
     const el = document.createElement('div');
     el.className = 'plan';
+    el.style.position = 'relative';
+    p.reactions ||= [];
+    const badgesHtml = p.reactions.map(r =>
+      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${r.emoji}</span>`
+    ).join('');
     el.innerHTML = `
       <div class="datebox"><div class="d">${d.getDate()}</div><div class="m">${d.toLocaleString(undefined,{month:'short'})}</div></div>
-      <div class="content"><strong>${escapeHtml(p.title)}</strong>${p.note ? `<p>${escapeHtml(p.note)}</p>` : ''}</div>
+      <div class="content">
+        <strong>${escapeHtml(p.title)}</strong>${p.note ? `<p>${escapeHtml(p.note)}</p>` : ''}
+        <div class="item-meta">${escapeHtml(displayNameFor(p.authorEmail, p.author || p.addedBy))}</div>
+      </div>
       <button class="edit" data-id="${p.id}" aria-label="Edit">✎</button>
       <button class="del" data-id="${p.id}" aria-label="Remove">✕</button>
+      ${p.reactions.length ? `<div class="reaction-corner-badge">${badgesHtml}</div>` : ''}
+      <div class="reaction-picker" style="display:none;">
+        ${REACTION_EMOJIS.map(e => `<button class="reaction-option" data-emoji="${e}">${e}</button>`).join('')}
+        <button class="reaction-option reaction-custom-btn" aria-label="Pick another emoji">+</button>
+        <input type="text" class="reaction-custom-input" style="display:none;" maxlength="8" inputmode="text">
+      </div>
     `;
     el.querySelector('.del').addEventListener('click', () => {
       if(!confirm(`Remove "${p.title}" from your plans? This can't be undone.`)) return;
@@ -1917,8 +2094,108 @@ function renderPlans(){
       renderPlans(); persist();
     });
     el.querySelector('.edit').addEventListener('click', () => startPlanEdit(p));
-    list.appendChild(el);
-  });
+
+    // WhatsApp-style: press and hold the card itself to bring up the reaction picker.
+    const picker = el.querySelector('.reaction-picker');
+    let pressTimer = null;
+    let startX = 0, startY = 0;
+    let longPressFired = false;
+
+    const openPicker = () => {
+      longPressFired = true;
+      $all('.reaction-picker').forEach(pk => pk.style.display = 'none');
+      picker.style.display = 'flex';
+      if(navigator.vibrate) navigator.vibrate(15); // subtle haptic tick, mirrors WhatsApp
+    };
+    const cancelPress = () => { clearTimeout(pressTimer); pressTimer = null; };
+
+    el.addEventListener('pointerdown', (ev) => {
+      if(ev.target.closest('.edit, .del, .reaction-option, .reaction-picker')) return;
+      longPressFired = false;
+      startX = ev.clientX; startY = ev.clientY;
+      pressTimer = setTimeout(openPicker, 450);
+    });
+    el.addEventListener('pointermove', (ev) => {
+      if(!pressTimer) return;
+      if(Math.abs(ev.clientX - startX) > 10 || Math.abs(ev.clientY - startY) > 10) cancelPress();
+    });
+    el.addEventListener('pointerup', cancelPress);
+    el.addEventListener('pointerleave', cancelPress);
+    el.addEventListener('click', (ev) => {
+      if(longPressFired){ ev.preventDefault(); ev.stopPropagation(); }
+    });
+
+    el.querySelectorAll('.reaction-option[data-emoji]').forEach(btn => {
+      btn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        const emoji = btn.dataset.emoji;
+        const existingIdx = p.reactions.findIndex(r => r.authorEmail === me.email);
+        if(existingIdx !== -1 && p.reactions[existingIdx].emoji === emoji){
+          p.reactions.splice(existingIdx, 1); // tapping your own reaction again removes it
+        } else if(existingIdx !== -1){
+          p.reactions[existingIdx].emoji = emoji; // switch to a different reaction
+        } else {
+          p.reactions.push({ emoji, authorEmail: me.email });
+        }
+        picker.style.display = 'none';
+        renderPlans(); persist();
+      });
+    });
+
+    // "+" lets you pick literally any emoji from your phone's own keyboard,
+    // not just the curated four.
+    const customBtn = el.querySelector('.reaction-custom-btn');
+    const customInput = el.querySelector('.reaction-custom-input');
+    function applyReaction(emoji){
+      if(!emoji) return;
+      const existingIdx = p.reactions.findIndex(r => r.authorEmail === me.email);
+      if(existingIdx !== -1 && p.reactions[existingIdx].emoji === emoji){
+        p.reactions.splice(existingIdx, 1);
+      } else if(existingIdx !== -1){
+        p.reactions[existingIdx].emoji = emoji;
+      } else {
+        p.reactions.push({ emoji, authorEmail: me.email });
+      }
+      renderPlans(); persist();
+    }
+    customBtn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      customBtn.style.display = 'none';
+      customInput.style.display = 'inline-block';
+      customInput.value = '';
+      customInput.focus();
+    });
+    let customHandled = false;
+    customInput.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Enter'){
+        ev.preventDefault();
+        customHandled = true;
+        picker.style.display = 'none';
+        applyReaction(customInput.value.trim());
+      }
+    });
+    customInput.addEventListener('blur', () => {
+      if(customHandled) return;
+      // Give a moment in case the blur was caused by tapping Enter/another button.
+      setTimeout(() => {
+        if(customInput.value.trim()){
+          picker.style.display = 'none';
+          applyReaction(customInput.value.trim());
+        }
+      }, 120);
+    });
+    customInput.addEventListener('click', (ev) => ev.stopPropagation());
+    return el;
+  }
+
+  upcoming.forEach(p => list.appendChild(buildCard(p)));
+  if(past.length){
+    const heading = document.createElement('h3');
+    heading.className = 'subsection-title';
+    heading.textContent = 'Crossed Off';
+    list.appendChild(heading);
+    past.forEach(p => list.appendChild(buildCard(p)));
+  }
 }
 
 /* ---------------- Countdown ---------------- */
@@ -1932,7 +2209,7 @@ $('#addCountdownBtn').addEventListener('click', () => {
     if(c){ c.label = label; c.date = date; }
     cancelCountdownEdit();
   } else {
-    data.countdowns.push({ id: uid(), label, date });
+    data.countdowns.push({ id: uid(), label, date, author: me.name, authorEmail: me.email });
     $('#cdLabel').value = ''; $('#cdDate').value = '';
   }
   renderCountdown(); persist();
@@ -1970,15 +2247,12 @@ function renderCountdown(){
     const diffDays = Math.round((target - todayMid) / 86400000);
     return { ...c, diffDays, targetDate: target };
   });
-  // soonest upcoming first, then today, then past events last
-  withDiff.sort((a, b) => {
-    const rank = v => v < 0 ? 1 : 0;
-    if(rank(a.diffDays) !== rank(b.diffDays)) return rank(a.diffDays) - rank(b.diffDays);
-    return a.diffDays - b.diffDays;
-  });
 
-  list.innerHTML = '';
-  withDiff.forEach(c => {
+  const upcoming = withDiff.filter(c => c.diffDays >= 0).sort((a, b) => a.diffDays - b.diffDays);
+  // Most recently passed first, when looking back.
+  const past = withDiff.filter(c => c.diffDays < 0).sort((a, b) => b.diffDays - a.diffDays);
+
+  function buildCard(c){
     const el = document.createElement('div');
     el.className = 'countdown-card';
     let num, sub;
@@ -1992,6 +2266,7 @@ function renderCountdown(){
         <div class="cd-label">${escapeHtml(c.label)}</div>
         <div class="cd-sub">${sub}</div>
         <div class="cd-date">${dateStr}</div>
+        <div class="item-meta">${escapeHtml(displayNameFor(c.authorEmail, c.author))}</div>
       </div>
       <button class="edit" data-id="${c.id}" aria-label="Edit">✎</button>
       <button class="del" data-id="${c.id}">✕</button>
@@ -2003,8 +2278,25 @@ function renderCountdown(){
       renderCountdown(); persist();
     });
     el.querySelector('.edit').addEventListener('click', () => startCountdownEdit(c));
-    list.appendChild(el);
-  });
+    return el;
+  }
+
+  list.innerHTML = '';
+  if(upcoming.length){
+    upcoming.forEach(c => list.appendChild(buildCard(c)));
+  } else if(past.length){
+    const empty = document.createElement('div');
+    empty.className = 'countdown-empty';
+    empty.textContent = 'Nothing upcoming — add one above 💜';
+    list.appendChild(empty);
+  }
+  if(past.length){
+    const heading = document.createElement('h3');
+    heading.className = 'subsection-title';
+    heading.textContent = 'Looking Back';
+    list.appendChild(heading);
+    past.forEach(c => list.appendChild(buildCard(c)));
+  }
 }
 
 let midnightRefreshTimer = null;
