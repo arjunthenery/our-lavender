@@ -602,11 +602,13 @@
   .plan .datebox{
     font-family:'Cormorant Garamond',serif; font-weight:700; text-align:center;
     background:var(--sage); color:#fff; border-radius:8px; padding:8px 10px; min-width:56px;
+    flex-shrink:0;
   }
   .plan .datebox .d{ font-size:1.3rem; line-height:1;}
   .plan .datebox .m{ font-size:0.65rem; text-transform:uppercase; letter-spacing:0.05em;}
-  .plan .content strong{ font-family:'Cormorant Garamond',serif; }
-  .plan .content p{ margin:4px 0 0; font-size:0.85rem; color:var(--plum-2); }
+  .plan .content{ flex:1; min-width:0; }
+  .plan .content strong{ font-family:'Cormorant Garamond',serif; word-break:break-word; overflow-wrap:break-word; }
+  .plan .content p{ margin:4px 0 0; font-size:0.85rem; color:var(--plum-2); word-break:break-word; overflow-wrap:break-word; }
   .plan button.del{ margin-left:8px; background:none; border:none; cursor:pointer; color:var(--rose); font-size:1rem; }
   .plan button.edit{ margin-left:auto; background:none; border:none; cursor:pointer; color:var(--plum-2); font-size:0.9rem; }
 
@@ -1008,7 +1010,7 @@
 
     <div class="card settings-grid">
       <h2 class="section-title">Ente Lavender PDF</h2>
-      <p style="font-size:0.78rem;color:var(--plum-2); margin:0;">Same PDF as the Ente Lavender tab — upload, replace, or remove it from here too.</p>
+      <p style="font-size:0.78rem;color:var(--plum-2); margin:0;">Manage the PDF shown in the Ente Lavender tab — upload, replace, or remove it here.</p>
       <div id="settingsEntePdfEmpty">
         <label class="btn small ghost attach-photo-btn" for="settingsEntePdfInput">Upload PDF</label>
         <input type="file" id="settingsEntePdfInput" accept="application/pdf" class="visually-hidden">
