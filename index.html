@@ -1979,7 +1979,7 @@ function renderFeed(){
     const el = document.createElement('div');
     el.className = 'post';
     const badgesHtml = p.reactions.map(r =>
-      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${r.emoji}</span>`
+      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${escapeHtml(r.emoji)}</span>`
     ).join('');
     el.innerHTML = `
       <div class="tape"></div>
@@ -2178,7 +2178,7 @@ function renderPlans(){
     el.style.position = 'relative';
     p.reactions ||= [];
     const badgesHtml = p.reactions.map(r =>
-      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${r.emoji}</span>`
+      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${escapeHtml(r.emoji)}</span>`
     ).join('');
     el.innerHTML = `
       <div class="date-col">
@@ -2238,17 +2238,8 @@ function renderPlans(){
     el.querySelectorAll('.reaction-option[data-emoji]').forEach(btn => {
       btn.addEventListener('click', (ev) => {
         ev.stopPropagation();
-        const emoji = btn.dataset.emoji;
-        const existingIdx = p.reactions.findIndex(r => r.authorEmail === me.email);
-        if(existingIdx !== -1 && p.reactions[existingIdx].emoji === emoji){
-          p.reactions.splice(existingIdx, 1); // tapping your own reaction again removes it
-        } else if(existingIdx !== -1){
-          p.reactions[existingIdx].emoji = emoji; // switch to a different reaction
-        } else {
-          p.reactions.push({ emoji, authorEmail: me.email });
-        }
         picker.style.display = 'none';
-        renderPlans(); persist();
+        applyReaction(btn.dataset.emoji);
       });
     });
 
@@ -2372,7 +2363,7 @@ function renderCountdown(){
     else { num = Math.abs(c.diffDays); sub = c.diffDays === -1 ? 'day ago' : 'days ago'; }
     const dateStr = c.targetDate.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric', year:'numeric' });
     const badgesHtml = c.reactions.map(r =>
-      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${r.emoji}</span>`
+      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${escapeHtml(r.emoji)}</span>`
     ).join('');
     el.innerHTML = `
       <div class="date-col">
@@ -2818,7 +2809,7 @@ function renderVeenchi(){
     el.className = 'veenchi-entry';
     el.style.position = 'relative';
     const badgesHtml = entry.reactions.map(r =>
-      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${r.emoji}</span>`
+      `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${escapeHtml(r.emoji)}</span>`
     ).join('');
     el.innerHTML = `
       <div class="veenchi-top">
