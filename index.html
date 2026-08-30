@@ -278,6 +278,12 @@
   .icon-btn:hover{ transform:rotate(90deg); }
   .icon-btn.spinning svg{ animation:iconSpin 0.7s linear infinite; }
   @keyframes iconSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+  .btn-spinner{
+    display:inline-block; width:14px; height:14px; margin-right:7px;
+    border:2px solid rgba(255,255,255,0.5); border-top-color:#fff;
+    border-radius:50%; animation:iconSpin 0.7s linear infinite;
+    vertical-align:-2px;
+  }
 
   /* washi tape tabs */
   nav.tabs{
@@ -589,6 +595,11 @@
   .reaction-custom-input{
     width:50px; border:none; outline:none; font-size:1.05rem;
     text-align:center; background:var(--paper-2); border-radius:999px; padding:3px 4px;
+  }
+  .reaction-custom-send{
+    border:none; background:var(--plum); color:#fff; cursor:pointer;
+    width:24px; height:24px; border-radius:50%; font-size:0.85rem; font-weight:700;
+    align-items:center; justify-content:center; flex-shrink:0;
   }
   .reaction-option{
     border:none; background:none; font-size:1.3rem; cursor:pointer;
@@ -1147,7 +1158,7 @@ let tokenClient = null;
 let saveTimer = null;
 
 const $ = (sel) => document.querySelector(sel);
-const REACTION_EMOJIS = ['❤️', '🥰', '🤗', '😊']; // shared reaction set — used by Plans and Veenchi's Space
+const REACTION_EMOJIS = ['❤️', '🫂', '😘', '😍']; // shared reaction set — Love, Hug, Kiss, Adore — used across Feed, Plans, Countdown, and Veenchi's Space
 const $all = (sel) => Array.from(document.querySelectorAll(sel));
 
 
@@ -1927,47 +1938,56 @@ $('#addPostBtn').addEventListener('click', async () => {
   const btn = $('#addPostBtn');
   const wasEditing = editingPostId;
   const originalLabel = wasEditing ? 'Save changes' : 'Pin it';
-  try{
-    const caption = $('#postCaption').value.trim();
-    const fileInput = $('#postImage');
-    let img = wasEditing ? data.posts.find(x => x.id === wasEditing)?.img : null;
-    if(pendingCroppedImg){
-      img = pendingCroppedImg;
-    }
-    if(!caption && !img){
-      alert("Add a caption or a photo before pinning.");
-      return;
-    }
-    if(wasEditing){
-      const post = data.posts.find(x => x.id === wasEditing);
-      if(post){
-        post.caption = caption;
-        post.img = img;
-        // Repair old/broken posts that never got an author attached in the first place.
-        if(!post.authorEmail){
-          post.authorEmail = me.email;
-          post.author = me.name;
-        }
+  const caption = $('#postCaption').value.trim();
+  const fileInput = $('#postImage');
+  let img = wasEditing ? data.posts.find(x => x.id === wasEditing)?.img : null;
+  if(pendingCroppedImg){
+    img = pendingCroppedImg;
+  }
+  if(!caption && !img){
+    alert("Add a caption or a photo before pinning.");
+    return;
+  }
+
+  // Keep a way to undo the optimistic UI update if the save actually fails,
+  // so you never end up with something on screen that didn't really save.
+  let rollback = () => {};
+  if(wasEditing){
+    const post = data.posts.find(x => x.id === wasEditing);
+    if(post){
+      const prevCaption = post.caption, prevImg = post.img;
+      const prevAuthorEmail = post.authorEmail, prevAuthor = post.author;
+      rollback = () => { post.caption = prevCaption; post.img = prevImg; post.authorEmail = prevAuthorEmail; post.author = prevAuthor; renderFeed(); };
+      post.caption = caption;
+      post.img = img;
+      if(!post.authorEmail){
+        post.authorEmail = me.email;
+        post.author = me.name;
       }
-      cancelPostEdit();
-    } else {
-      data.posts.unshift({
-        id: uid(), caption, img,
-        author: me.name, authorEmail: me.email, ts: Date.now()
-      });
-      $('#postCaption').value = ''; fileInput.value = '';
     }
-    pendingCroppedImg = null;
-    lastRawImageDataUrl = null;
-    $('#postImgPreviewWrap').style.display = 'none';
-    renderFeed();
-    await persist();
+    cancelPostEdit();
+  } else {
+    const newPost = { id: uid(), caption, img, author: me.name, authorEmail: me.email, ts: Date.now() };
+    data.posts.unshift(newPost);
+    rollback = () => { data.posts = data.posts.filter(x => x.id !== newPost.id); renderFeed(); };
+    $('#postCaption').value = ''; fileInput.value = '';
+  }
+  pendingCroppedImg = null;
+  lastRawImageDataUrl = null;
+  $('#postImgPreviewWrap').style.display = 'none';
+  renderFeed();
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="btn-spinner"></span>Posting...`;
+  try{
+    await persistNow();
   }catch(err){
     console.error(err);
-    alert("Couldn't pin that: " + err.message);
+    rollback();
+    alert("That didn't actually save — please try again: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.textContent = originalLabel;
+    btn.textContent = editingPostId ? 'Save changes' : 'Pin it';
   }
 });
 
@@ -1995,6 +2015,7 @@ function renderFeed(){
         ${REACTION_EMOJIS.map(e => `<button class="reaction-option" data-emoji="${e}">${e}</button>`).join('')}
         <button class="reaction-option reaction-custom-btn" aria-label="Pick another emoji">+</button>
         <input type="text" class="reaction-custom-input" style="display:none;" maxlength="8" inputmode="text">
+        <button class="reaction-custom-send" type="button" style="display:none;" aria-label="Add this reaction">✓</button>
       </div>
     `;
     el.querySelector('.post-del').addEventListener('click', () => {
@@ -2056,30 +2077,31 @@ function renderFeed(){
     });
     const customBtn = el.querySelector('.reaction-custom-btn');
     const customInput = el.querySelector('.reaction-custom-input');
-    let customHandled = false;
+    const customSend = el.querySelector('.reaction-custom-send');
     customBtn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       customBtn.style.display = 'none';
       customInput.style.display = 'inline-block';
+      customSend.style.display = 'inline-flex';
       customInput.value = '';
       customInput.focus();
+    });
+    // Explicit send button — nothing applies automatically while typing/picking.
+    function submitCustomEmoji(){
+      const val = customInput.value.trim();
+      if(!val) return;
+      picker.style.display = 'none';
+      applyReaction(val);
+    }
+    customSend.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      submitCustomEmoji();
     });
     customInput.addEventListener('keydown', (ev) => {
       if(ev.key === 'Enter'){
         ev.preventDefault();
-        customHandled = true;
-        picker.style.display = 'none';
-        applyReaction(customInput.value.trim());
+        submitCustomEmoji();
       }
-    });
-    customInput.addEventListener('blur', () => {
-      if(customHandled) return;
-      setTimeout(() => {
-        if(customInput.value.trim()){
-          picker.style.display = 'none';
-          applyReaction(customInput.value.trim());
-        }
-      }, 120);
     });
     customInput.addEventListener('click', (ev) => ev.stopPropagation());
 
@@ -2125,20 +2147,44 @@ document.addEventListener('click', () => {
   $all('.reaction-picker').forEach(pk => pk.style.display = 'none');
 });
 
-$('#addPlanBtn').addEventListener('click', () => {
+$('#addPlanBtn').addEventListener('click', async () => {
+  const btn = $('#addPlanBtn');
   const date = $('#planDate').value;
   const title = $('#planTitle').value.trim();
   const note = $('#planNote').value.trim();
   if(!date || !title) return;
-  if(editingPlanId){
-    const plan = data.plans.find(x => x.id === editingPlanId);
-    if(plan){ plan.date = date; plan.title = title; plan.note = note; }
+
+  const wasEditing = editingPlanId;
+  const originalLabel = wasEditing ? 'Save changes' : 'Add to plans';
+  let rollback = () => {};
+  if(wasEditing){
+    const plan = data.plans.find(x => x.id === wasEditing);
+    if(plan){
+      const prev = { date: plan.date, title: plan.title, note: plan.note };
+      rollback = () => { Object.assign(plan, prev); renderPlans(); };
+      plan.date = date; plan.title = title; plan.note = note;
+    }
     cancelPlanEdit();
   } else {
-    data.plans.push({ id: uid(), date, title, note, author: me.name, authorEmail: me.email });
+    const newPlan = { id: uid(), date, title, note, author: me.name, authorEmail: me.email };
+    data.plans.push(newPlan);
+    rollback = () => { data.plans = data.plans.filter(x => x.id !== newPlan.id); renderPlans(); };
     $('#planDate').value=''; $('#planTitle').value=''; $('#planNote').value='';
   }
-  renderPlans(); persist();
+  renderPlans();
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="btn-spinner"></span>Saving...`;
+  try{
+    await persistNow();
+  }catch(err){
+    console.error(err);
+    rollback();
+    alert("That didn't actually save — please try again: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editingPlanId ? 'Save changes' : 'Add to plans';
+  }
 });
 
 function startPlanEdit(p){
@@ -2195,6 +2241,7 @@ function renderPlans(){
         ${REACTION_EMOJIS.map(e => `<button class="reaction-option" data-emoji="${e}">${e}</button>`).join('')}
         <button class="reaction-option reaction-custom-btn" aria-label="Pick another emoji">+</button>
         <input type="text" class="reaction-custom-input" style="display:none;" maxlength="8" inputmode="text">
+        <button class="reaction-custom-send" type="button" style="display:none;" aria-label="Add this reaction">✓</button>
       </div>
     `;
     el.querySelector('.del').addEventListener('click', () => {
@@ -2247,6 +2294,7 @@ function renderPlans(){
     // not just the curated four.
     const customBtn = el.querySelector('.reaction-custom-btn');
     const customInput = el.querySelector('.reaction-custom-input');
+    const customSend = el.querySelector('.reaction-custom-send');
     function applyReaction(emoji){
       if(!emoji) return;
       const existingIdx = p.reactions.findIndex(r => r.authorEmail === me.email);
@@ -2263,27 +2311,26 @@ function renderPlans(){
       ev.stopPropagation();
       customBtn.style.display = 'none';
       customInput.style.display = 'inline-block';
+      customSend.style.display = 'inline-flex';
       customInput.value = '';
       customInput.focus();
     });
-    let customHandled = false;
+    // Explicit send button — nothing applies automatically while typing/picking.
+    function submitCustomEmoji(){
+      const val = customInput.value.trim();
+      if(!val) return;
+      picker.style.display = 'none';
+      applyReaction(val);
+    }
+    customSend.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      submitCustomEmoji();
+    });
     customInput.addEventListener('keydown', (ev) => {
       if(ev.key === 'Enter'){
         ev.preventDefault();
-        customHandled = true;
-        picker.style.display = 'none';
-        applyReaction(customInput.value.trim());
+        submitCustomEmoji();
       }
-    });
-    customInput.addEventListener('blur', () => {
-      if(customHandled) return;
-      // Give a moment in case the blur was caused by tapping Enter/another button.
-      setTimeout(() => {
-        if(customInput.value.trim()){
-          picker.style.display = 'none';
-          applyReaction(customInput.value.trim());
-        }
-      }, 120);
     });
     customInput.addEventListener('click', (ev) => ev.stopPropagation());
     return el;
@@ -2301,19 +2348,42 @@ function renderPlans(){
 
 /* ---------------- Countdown ---------------- */
 let editingCountdownId = null;
-$('#addCountdownBtn').addEventListener('click', () => {
+$('#addCountdownBtn').addEventListener('click', async () => {
+  const btn = $('#addCountdownBtn');
   const label = $('#cdLabel').value.trim();
   const date = $('#cdDate').value;
   if(!label || !date) return;
-  if(editingCountdownId){
-    const c = data.countdowns.find(x => x.id === editingCountdownId);
-    if(c){ c.label = label; c.date = date; }
+
+  const wasEditing = editingCountdownId;
+  let rollback = () => {};
+  if(wasEditing){
+    const c = data.countdowns.find(x => x.id === wasEditing);
+    if(c){
+      const prev = { label: c.label, date: c.date };
+      rollback = () => { Object.assign(c, prev); renderCountdown(); };
+      c.label = label; c.date = date;
+    }
     cancelCountdownEdit();
   } else {
-    data.countdowns.push({ id: uid(), label, date, author: me.name, authorEmail: me.email });
+    const newC = { id: uid(), label, date, author: me.name, authorEmail: me.email };
+    data.countdowns.push(newC);
+    rollback = () => { data.countdowns = data.countdowns.filter(x => x.id !== newC.id); renderCountdown(); };
     $('#cdLabel').value = ''; $('#cdDate').value = '';
   }
-  renderCountdown(); persist();
+  renderCountdown();
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="btn-spinner"></span>Saving...`;
+  try{
+    await persistNow();
+  }catch(err){
+    console.error(err);
+    rollback();
+    alert("That didn't actually save — please try again: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editingCountdownId ? 'Save changes' : 'Add countdown';
+  }
 });
 
 function startCountdownEdit(c){
@@ -2382,6 +2452,7 @@ function renderCountdown(){
         ${REACTION_EMOJIS.map(e => `<button class="reaction-option" data-emoji="${e}">${e}</button>`).join('')}
         <button class="reaction-option reaction-custom-btn" aria-label="Pick another emoji">+</button>
         <input type="text" class="reaction-custom-input" style="display:none;" maxlength="8" inputmode="text">
+        <button class="reaction-custom-send" type="button" style="display:none;" aria-label="Add this reaction">✓</button>
       </div>
     `;
     el.querySelector('.del').addEventListener('click', () => {
@@ -2443,30 +2514,31 @@ function renderCountdown(){
     });
     const customBtn = el.querySelector('.reaction-custom-btn');
     const customInput = el.querySelector('.reaction-custom-input');
-    let customHandled = false;
+    const customSend = el.querySelector('.reaction-custom-send');
     customBtn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       customBtn.style.display = 'none';
       customInput.style.display = 'inline-block';
+      customSend.style.display = 'inline-flex';
       customInput.value = '';
       customInput.focus();
+    });
+    // Explicit send button — nothing applies automatically while typing/picking.
+    function submitCustomEmoji(){
+      const val = customInput.value.trim();
+      if(!val) return;
+      picker.style.display = 'none';
+      applyReaction(val);
+    }
+    customSend.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      submitCustomEmoji();
     });
     customInput.addEventListener('keydown', (ev) => {
       if(ev.key === 'Enter'){
         ev.preventDefault();
-        customHandled = true;
-        picker.style.display = 'none';
-        applyReaction(customInput.value.trim());
+        submitCustomEmoji();
       }
-    });
-    customInput.addEventListener('blur', () => {
-      if(customHandled) return;
-      setTimeout(() => {
-        if(customInput.value.trim()){
-          picker.style.display = 'none';
-          applyReaction(customInput.value.trim());
-        }
-      }, 120);
     });
     customInput.addEventListener('click', (ev) => ev.stopPropagation());
 
@@ -2741,20 +2813,30 @@ $('#settingsRemoveEntePdfBtn').addEventListener('click', removeEntePdf);
 /* ---------------- Veenchi's Space ---------------- */
 let editingVeenchiId = null;
 
-$('#addVeenchiBtn').addEventListener('click', () => {
+$('#addVeenchiBtn').addEventListener('click', async () => {
+  const btn = $('#addVeenchiBtn');
   const text = $('#veenchiText').value.trim();
   if(!text && !pendingVeenchiImg) return;
-  if(editingVeenchiId){
-    const entry = data.veenchiThoughts.find(x => x.id === editingVeenchiId);
-    // Only the text/photo change on edit — createdAt is intentionally left untouched,
-    // so the original date/time stamp never moves just because it was edited.
-    if(entry){ entry.text = text; entry.img = pendingVeenchiImg; }
+
+  const wasEditing = editingVeenchiId;
+  let rollback = () => {};
+  if(wasEditing){
+    const entry = data.veenchiThoughts.find(x => x.id === wasEditing);
+    if(entry){
+      const prev = { text: entry.text, img: entry.img };
+      rollback = () => { Object.assign(entry, prev); renderVeenchi(); };
+      // Only the text/photo change on edit — createdAt is intentionally left untouched,
+      // so the original date/time stamp never moves just because it was edited.
+      entry.text = text; entry.img = pendingVeenchiImg;
+    }
     cancelVeenchiEdit();
   } else {
-    data.veenchiThoughts.unshift({
+    const newEntry = {
       id: uid(), text, img: pendingVeenchiImg,
       author: me.name, authorEmail: me.email, createdAt: Date.now()
-    });
+    };
+    data.veenchiThoughts.unshift(newEntry);
+    rollback = () => { data.veenchiThoughts = data.veenchiThoughts.filter(x => x.id !== newEntry.id); renderVeenchi(); };
     $('#veenchiText').value = '';
     $('#veenchiImage').value = '';
     pendingVeenchiImg = null;
@@ -2762,7 +2844,19 @@ $('#addVeenchiBtn').addEventListener('click', () => {
     $('#veenchiImgPreviewWrap').style.display = 'none';
   }
   renderVeenchi();
-  persist();
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="btn-spinner"></span>Saving...`;
+  try{
+    await persistNow();
+  }catch(err){
+    console.error(err);
+    rollback();
+    alert("That didn't actually save — please try again: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = editingVeenchiId ? 'Save changes' : 'Add thought';
+  }
 });
 
 function startVeenchiEdit(entry){
@@ -2826,6 +2920,7 @@ function renderVeenchi(){
         ${REACTION_EMOJIS.map(e => `<button class="reaction-option" data-emoji="${e}">${e}</button>`).join('')}
         <button class="reaction-option reaction-custom-btn" aria-label="Pick another emoji">+</button>
         <input type="text" class="reaction-custom-input" style="display:none;" maxlength="8" inputmode="text">
+        <button class="reaction-custom-send" type="button" style="display:none;" aria-label="Add this reaction">✓</button>
       </div>
     `;
     el.querySelector('.del').addEventListener('click', () => {
@@ -2887,30 +2982,31 @@ function renderVeenchi(){
     });
     const customBtn = el.querySelector('.reaction-custom-btn');
     const customInput = el.querySelector('.reaction-custom-input');
-    let customHandled = false;
+    const customSend = el.querySelector('.reaction-custom-send');
     customBtn.addEventListener('click', (ev) => {
       ev.stopPropagation();
       customBtn.style.display = 'none';
       customInput.style.display = 'inline-block';
+      customSend.style.display = 'inline-flex';
       customInput.value = '';
       customInput.focus();
+    });
+    // Explicit send button — nothing applies automatically while typing/picking.
+    function submitCustomEmoji(){
+      const val = customInput.value.trim();
+      if(!val) return;
+      picker.style.display = 'none';
+      applyReaction(val);
+    }
+    customSend.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      submitCustomEmoji();
     });
     customInput.addEventListener('keydown', (ev) => {
       if(ev.key === 'Enter'){
         ev.preventDefault();
-        customHandled = true;
-        picker.style.display = 'none';
-        applyReaction(customInput.value.trim());
+        submitCustomEmoji();
       }
-    });
-    customInput.addEventListener('blur', () => {
-      if(customHandled) return;
-      setTimeout(() => {
-        if(customInput.value.trim()){
-          picker.style.display = 'none';
-          applyReaction(customInput.value.trim());
-        }
-      }, 120);
     });
     customInput.addEventListener('click', (ev) => ev.stopPropagation());
 
