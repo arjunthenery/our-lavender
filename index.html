@@ -646,7 +646,7 @@
     font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:600;
     font-size:1.1rem; color:var(--plum); margin:0 0 2px;
   }
-  .countdown-card .cd-sub{ font-family:'Caveat',cursive; color:var(--rose); font-size:1.15rem; }
+  .countdown-card .cd-sub{ font-family:'Caveat',cursive; color:var(--rose); font-size:0.95rem; text-align:center; margin-top:-6px; }
   .countdown-card .cd-date{ font-size:0.72rem; color:var(--plum-2); margin-top:2px; }
   .countdown-card .del{
     position:absolute; top:12px; right:12px; background:none; border:none; cursor:pointer;
@@ -1248,6 +1248,9 @@ function updateWhoBadge(){
 }
 
 async function afterSignIn(){
+  const btn = $('#signInBtn');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="btn-spinner"></span>Signing in...`;
   setSync('busy', 'Signing in...');
   try{
     const uRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -1265,11 +1268,14 @@ async function afterSignIn(){
     // Signed in, but stay on the cover — swap the button so opening the book
     // itself is a deliberate second step, rather than jumping straight in.
     readyToOpenBook = true;
-    $('#signInBtn').textContent = 'Open Book';
+    btn.disabled = false;
+    btn.textContent = 'Open Book';
     applyBirthdaySurpriseIfNeeded();
   }catch(e){
     console.error('Sign-in failed:', e);
     setSync('err', 'Sign-in failed');
+    btn.disabled = false;
+    btn.textContent = 'Sign in with Google';
     alert("Something went wrong finishing sign-in: " + e.message + "\n\nPlease try signing in again. If this keeps happening, check your internet connection or Drive permissions.");
   }
 }
@@ -2403,6 +2409,29 @@ function cancelCountdownEdit(){
 }
 $('#cancelCountdownEditBtn').addEventListener('click', cancelCountdownEdit);
 
+// Turns a raw day-count into a human-friendly unit: years if there's at
+// least one full year to go/passed, months if at least one full month,
+// otherwise days. Uses real calendar math (not just dividing by 365/30),
+// so it stays accurate across leap years and different month lengths.
+function relativeCountdownParts(diffDays, targetDate, todayMid){
+  const forward = diffDays >= 0;
+  const a = forward ? todayMid : targetDate;
+  const b = forward ? targetDate : todayMid;
+  let years = b.getFullYear() - a.getFullYear();
+  let months = b.getMonth() - a.getMonth();
+  let days = b.getDate() - a.getDate();
+  if(days < 0){
+    months -= 1;
+    days += new Date(b.getFullYear(), b.getMonth(), 0).getDate(); // days in the prior month
+  }
+  if(months < 0){ years -= 1; months += 12; }
+
+  if(years >= 1) return { num: years, unit: years === 1 ? 'year' : 'years' };
+  if(months >= 1) return { num: months, unit: months === 1 ? 'month' : 'months' };
+  const wholeDays = Math.abs(diffDays);
+  return { num: wholeDays, unit: wholeDays === 1 ? 'day' : 'days' };
+}
+
 function renderCountdown(){
   const list = $('#countdownList');
   if(!data.countdowns.length){
@@ -2429,9 +2458,13 @@ function renderCountdown(){
     el.className = 'countdown-card';
     c.reactions ||= [];
     let num, sub;
-    if(c.diffDays > 0){ num = c.diffDays; sub = c.diffDays === 1 ? 'day to go' : 'days to go'; }
-    else if(c.diffDays === 0){ num = '🎉'; sub = "it's today!"; }
-    else { num = Math.abs(c.diffDays); sub = c.diffDays === -1 ? 'day ago' : 'days ago'; }
+    if(c.diffDays === 0){
+      num = '🎉'; sub = "it's today!";
+    } else {
+      const { num: relNum, unit } = relativeCountdownParts(c.diffDays, c.targetDate, todayMid);
+      num = relNum;
+      sub = c.diffDays > 0 ? `${unit} to go` : `${unit} ago`;
+    }
     const dateStr = c.targetDate.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric', year:'numeric' });
     const badgesHtml = c.reactions.map(r =>
       `<span class="reaction-badge" title="${escapeHtml(displayNameFor(r.authorEmail))}">${escapeHtml(r.emoji)}</span>`
@@ -2439,11 +2472,11 @@ function renderCountdown(){
     el.innerHTML = `
       <div class="date-col">
         <div class="cd-num">${num}</div>
+        <div class="cd-sub">${sub}</div>
         <div class="author-badge">${escapeHtml(displayNameFor(c.authorEmail, c.author))}</div>
       </div>
       <div class="cd-info">
         <div class="cd-label">${escapeHtml(c.label)}</div>
-        <div class="cd-sub">${sub}</div>
         <div class="cd-date">${dateStr}</div>
       </div>
       <button class="edit" data-id="${c.id}" aria-label="Edit">✎</button>
