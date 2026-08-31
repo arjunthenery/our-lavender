@@ -573,6 +573,7 @@
   .post .post-actions .post-edit{ color:var(--plum-2); font-size:0.78rem; }
   .post img{ width:100%; display:block; border-radius:1px; margin-bottom:10px; background:var(--paper-2); }
   .post .cap{ font-family:'Caveat',cursive; font-size:1.25rem; color:var(--ink); line-height:1.3; }
+  .post .cap .veenchi-mal{ font-family:'Chilanka',cursive; font-weight:400; font-style:italic; font-size:0.74em; }
   .post .meta{ font-size:0.72rem; color:var(--plum-2); margin-top:8px; display:flex; justify-content:space-between; }
   .date-col{ display:flex; flex-direction:column; align-items:center; gap:9px; flex-shrink:0; }
   .author-badge{
@@ -2008,7 +2009,7 @@ function renderFeed(){
         <button class="post-del" data-id="${p.id}" aria-label="Remove">✕</button>
       </div>
       ${p.img ? `<img src="${p.img}" alt="">` : ''}
-      ${p.caption ? `<div class="cap">${escapeHtml(p.caption)}</div>` : ''}
+      ${p.caption ? `<div class="cap">${formatMixedScript(p.caption)}</div>` : ''}
       <div class="meta"><span>${escapeHtml(displayNameFor(p.authorEmail, p.author))}</span><span>${fmtDate(p.ts)}</span></div>
       ${p.reactions.length ? `<div class="reaction-corner-badge">${badgesHtml}</div>` : ''}
       <div class="reaction-picker" style="display:none;">
